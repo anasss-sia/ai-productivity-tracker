@@ -237,7 +237,7 @@ export default function TasksPage() {
               tasks.map((task) => (
                 <article
                   key={task.id}
-                  className="rounded-lg border border-border bg-cool p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-surface p-5 shadow-sm"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
@@ -255,35 +255,22 @@ export default function TasksPage() {
                     <button
                       type="button"
                       onClick={() => setEditingTask(task)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted hover:bg-cool"
+                      className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted hover:bg-background"
                     >
                       Редактировать
                     </button>
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2 text-sm">
-                    <span className="rounded-lg bg-cool px-3 py-1 text-muted">
+                    <span className="rounded-lg bg-background px-3 py-1 text-muted">
                       {statusLabels[task.status]}
                     </span>
-                    <span className="rounded-lg bg-cool px-3 py-1 text-muted">
+                    <span className="rounded-lg bg-background px-3 py-1 text-muted">
                       {priorityLabels[task.priority]} приоритет
                     </span>
                   </div>
 
                   <div className="mt-5 flex flex-wrap gap-2">
-                    {Object.keys(statusLabels).map((status) => (
-                      <button
-                        key={status}
-                        type="button"
-                        onClick={() =>
-                          updateTask(task.id, { status: status as TaskStatus })
-                        }
-                        className="rounded-lg border border-border px-3 py-2 text-sm text-muted hover:bg-cool"
-                      >
-                        {statusLabels[status as TaskStatus]}
-                      </button>
-                    ))}
-
                     <button
                       type="button"
                       onClick={() => deleteTask(task.id)}
@@ -330,39 +317,45 @@ export default function TasksPage() {
                 />
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <select
-                    value={editingTask.status}
-                    onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        status: e.target.value as TaskStatus,
-                      })
-                    }
-                    className="rounded-lg border border-border p-3"
-                  >
-                    {Object.entries(statusLabels).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="grid gap-2 text-sm font-medium text-muted">
+                    Статус
+                    <select
+                      value={editingTask.status}
+                      onChange={(e) =>
+                        setEditingTask({
+                          ...editingTask,
+                          status: e.target.value as TaskStatus,
+                        })
+                      }
+                      className="rounded-lg border border-border p-3"
+                    >
+                      {Object.entries(statusLabels).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
 
-                  <select
-                    value={editingTask.priority}
-                    onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        priority: e.target.value as TaskPriority,
-                      })
-                    }
-                    className="rounded-lg border border-border p-3"
-                  >
-                    {Object.entries(priorityLabels).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="grid gap-2 text-sm font-medium text-muted">
+                    Приоритет
+                    <select
+                      value={editingTask.priority}
+                      onChange={(e) =>
+                        setEditingTask({
+                          ...editingTask,
+                          priority: e.target.value as TaskPriority,
+                        })
+                      }
+                      className="rounded-lg border border-border p-3"
+                    >
+                      {Object.entries(priorityLabels).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
               </div>
 

@@ -4,9 +4,8 @@
   --background: #f8f8f8;
   --foreground: #3e3630;
   --surface: #edebe0;
-  --cool: #e0e3ed;
-  --accent: #c7d3db;
-  --accent-strong: #a79a8a;
+  --accent: #a79a8a;
+  --accent-strong: #3e3630;
   --border: #b2b4b7;
   --muted: #6f675f;
 }
@@ -15,7 +14,6 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
-  --color-cool: var(--cool);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-border: var(--border);

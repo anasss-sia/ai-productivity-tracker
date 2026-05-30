@@ -23,7 +23,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/register"
-                className="rounded-lg border border-border bg-surface px-5 py-3 text-center font-medium text-foreground hover:bg-cool"
+                className="rounded-lg border border-border bg-surface px-5 py-3 text-center font-medium text-foreground hover:bg-background"
               >
                 Зарегистрироваться
               </Link>

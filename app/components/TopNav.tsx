@@ -39,7 +39,7 @@ export function TopNav() {
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                     isActive
                       ? "bg-foreground text-background"
-                      : "text-muted hover:bg-cool hover:text-foreground"
+                      : "text-muted hover:bg-background hover:text-foreground"
                   }`}
                 >
                   {item.label}

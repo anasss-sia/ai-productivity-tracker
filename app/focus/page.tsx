@@ -366,7 +366,7 @@ export default function FocusPage() {
                   value={taskId}
                   disabled={isStarted}
                   onChange={(e) => setTaskId(e.target.value)}
-                  className="rounded-lg border border-border p-3 disabled:bg-cool"
+                  className="rounded-lg border border-border p-3 disabled:bg-background"
                 >
                   <option value="">Без задачи</option>
                   {tasks.map((task) => (
@@ -383,7 +383,7 @@ export default function FocusPage() {
                   value={mode}
                   disabled={isStarted}
                   onChange={(e) => changeMode(e.target.value as Mode)}
-                  className="rounded-lg border border-border p-3 disabled:bg-cool"
+                  className="rounded-lg border border-border p-3 disabled:bg-background"
                 >
                   <option value="POMODORO_25_5">25/5</option>
                   <option value="DEEP_WORK_50_10">50/10</option>
@@ -404,7 +404,7 @@ export default function FocusPage() {
                       setFocusDuration(value);
                       setTimeLeft(getValidNumber(value, 1) * 60);
                     }}
-                    className="rounded-lg border border-border p-3 disabled:bg-cool"
+                    className="rounded-lg border border-border p-3 disabled:bg-background"
                   />
                 </label>
 
@@ -418,7 +418,7 @@ export default function FocusPage() {
                     onChange={(e) =>
                       setBreakDuration(cleanPositiveNumber(e.target.value))
                     }
-                    className="rounded-lg border border-border p-3 disabled:bg-cool"
+                    className="rounded-lg border border-border p-3 disabled:bg-background"
                   />
                 </label>
 
@@ -432,15 +432,15 @@ export default function FocusPage() {
                     onChange={(e) =>
                       setPlannedCycles(cleanPositiveNumber(e.target.value))
                     }
-                    className="rounded-lg border border-border p-3 disabled:bg-cool"
+                    className="rounded-lg border border-border p-3 disabled:bg-background"
                   />
                 </label>
               </div>
             </div>
           </section>
 
-          <section className="rounded-lg border border-border bg-cool p-6 text-center shadow-sm">
-            <div className="inline-flex rounded-lg bg-surface px-4 py-2 text-sm font-medium text-muted">
+          <section className="rounded-lg border border-border bg-surface p-6 text-center shadow-sm">
+            <div className="inline-flex rounded-lg bg-background px-4 py-2 text-sm font-medium text-muted">
               {phase === "break" ? "Перерыв" : "Фокус"}
             </div>
 
@@ -488,7 +488,7 @@ export default function FocusPage() {
                   <button
                     type="button"
                     onClick={finishEarly}
-                    className="rounded-lg bg-accent-strong p-3 font-medium text-background hover:bg-muted"
+                    className="rounded-lg bg-accent p-3 font-medium text-background hover:bg-muted"
                   >
                     Завершить сессию
                   </button>

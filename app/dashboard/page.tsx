@@ -12,18 +12,9 @@ type User = {
   email: string;
 };
 
-type AnalyticsSummary = {
-  totalSessions: number;
-  completedSessions: number;
-  totalFocusMinutes: number;
-  averageProductivityScore: number;
-  bestFocusTimeRange: string | null;
-};
-
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -36,18 +27,6 @@ export default function DashboardPage() {
       }
 
       setUser(savedUser);
-
-      void fetch("/api/analytics", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          if (data) {
-            setSummary(data);
-          }
-        });
     }, 0);
 
     return () => window.clearTimeout(timeout);
@@ -68,21 +47,7 @@ export default function DashboardPage() {
           </p>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-4">
-          {[
-            ["Минут фокуса", summary?.totalFocusMinutes ?? 0],
-            ["Всего сессий", summary?.totalSessions ?? 0],
-            ["Завершено сессий", summary?.completedSessions ?? 0],
-            ["Продуктивность", summary?.averageProductivityScore ?? 0],
-          ].map(([label, value]) => (
-            <div key={label} className="rounded-lg border border-border bg-surface p-5 shadow-sm">
-              <p className="text-sm text-muted">{label}</p>
-              <p className="mt-3 text-3xl font-bold text-foreground">{value}</p>
-            </div>
-          ))}
-        </section>
-
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
+        <section className="grid gap-4 md:grid-cols-3">
           {[
             {
               title: "Задачи",
@@ -98,10 +63,7 @@ export default function DashboardPage() {
             },
             {
               title: "Аналитика",
-              description:
-                summary?.bestFocusTimeRange
-                  ? `Лучшее время: ${summary.bestFocusTimeRange}.`
-                  : "Посмотреть метрики, графики и AI-профиль.",
+              description: "Посмотреть метрики, графики и AI-профиль.",
               href: "/analytics",
               action: "Смотреть аналитику",
             },
@@ -109,7 +71,7 @@ export default function DashboardPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-lg border border-border bg-cool p-6 shadow-sm transition hover:border-border hover:shadow-md"
+              className="rounded-lg border border-border bg-surface p-6 shadow-sm transition hover:border-border hover:shadow-md"
             >
               <h2 className="text-xl font-semibold text-foreground">{item.title}</h2>
               <p className="mt-2 min-h-12 text-sm leading-6 text-muted">

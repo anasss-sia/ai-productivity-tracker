@@ -103,15 +103,14 @@ function priorityClassName(priority: string) {
 
 const chartColors = {
   axis: "#3E3630",
-  fill: "#C7D3DB",
-  fillLight: "#E0E3ED",
-  fillDark: "#A79A8A",
+  fill: "#A79A8A",
+  fillDark: "#3E3630",
   track: "#F8F8F8",
 };
 
 function EmptyChart() {
   return (
-    <div className="flex h-full min-h-44 w-full items-center justify-center rounded-xl bg-cool text-sm text-muted">
+    <div className="flex h-full min-h-44 w-full items-center justify-center rounded-xl bg-background text-sm text-muted">
       Недостаточно данных
     </div>
   );
@@ -123,17 +122,17 @@ function ChartRow({
   max,
   valueLabel,
   detail,
-  accent = "blue",
+  accent = "taupe",
 }: {
   label: string;
   value: number;
   max: number;
   valueLabel: string;
   detail?: string;
-  accent?: "blue" | "taupe";
+  accent?: "taupe" | "coffee";
 }) {
   const width = value > 0 ? Math.max((value / max) * 100, 5) : 0;
-  const color = accent === "taupe" ? chartColors.fillDark : chartColors.fill;
+  const color = accent === "coffee" ? chartColors.fillDark : chartColors.fill;
 
   return (
     <div className="grid gap-2">
@@ -164,7 +163,7 @@ function BarChart({ data }: { data: ChartPoint[] }) {
   const max = Math.max(...data.map((item) => item.minutes), 1);
 
   return (
-    <div className="mt-5 rounded-xl bg-cool p-4">
+    <div className="mt-5 rounded-xl bg-background p-4">
       {data.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -177,7 +176,7 @@ function BarChart({ data }: { data: ChartPoint[] }) {
               max={max}
               valueLabel={`${item.minutes} мин`}
               detail="фокус-время за день"
-              accent={index % 2 === 0 ? "blue" : "taupe"}
+              accent={index % 2 === 0 ? "taupe" : "coffee"}
             />
           ))}
         </div>
@@ -190,7 +189,7 @@ function CycleChart({ data }: { data: CyclePoint[] }) {
   const chartData = data.slice(-8);
 
   return (
-    <div className="mt-5 rounded-xl bg-cool p-4">
+    <div className="mt-5 rounded-xl bg-background p-4">
       {chartData.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -203,7 +202,7 @@ function CycleChart({ data }: { data: CyclePoint[] }) {
               max={100}
               valueLabel={`${item.completedCycles}/${item.plannedCycles} циклов`}
               detail={`${Math.round(item.completionRate)}% завершено`}
-              accent={index % 2 === 0 ? "taupe" : "blue"}
+              accent={index % 2 === 0 ? "coffee" : "taupe"}
             />
           ))}
         </div>
@@ -217,7 +216,7 @@ function HourChart({ data }: { data: HourPoint[] }) {
   const max = Math.max(...activeHours.map((item) => item.score), 1);
 
   return (
-    <div className="mt-5 rounded-xl bg-cool p-4">
+    <div className="mt-5 rounded-xl bg-background p-4">
       {activeHours.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -233,7 +232,7 @@ function HourChart({ data }: { data: HourPoint[] }) {
                 max={max}
                 valueLabel={`${item.score}%`}
                 detail={`${item.sessions} сесс., ${item.minutes} мин`}
-                accent={index % 2 === 0 ? "blue" : "taupe"}
+                accent={index % 2 === 0 ? "taupe" : "coffee"}
               />
             );
           })}
@@ -247,7 +246,7 @@ function MiniGauge({ value }: { value: number }) {
   const safeValue = Math.max(0, Math.min(value, 100));
 
   return (
-    <div className="relative size-28 rounded-full bg-cool">
+    <div className="relative size-28 rounded-full bg-background">
       <div
         className="absolute inset-0 rounded-full"
         style={{
@@ -369,7 +368,7 @@ export default function AnalyticsPage() {
                 ].map(([label, value]) => (
                   <div
                     key={label}
-                    className="rounded-xl border border-border bg-cool p-4"
+                    className="rounded-xl border border-border bg-surface p-4"
                   >
                     <p className="text-xs text-muted">{label}</p>
                     <p className="mt-2 text-xl font-bold text-foreground">{value}</p>
@@ -508,7 +507,7 @@ export default function AnalyticsPage() {
                     <h3 className="text-xl font-bold text-foreground">
                       Фокус-профиль
                     </h3>
-                    <span className="rounded-lg bg-cool px-3 py-1 text-sm text-muted">
+                    <span className="rounded-lg bg-background px-3 py-1 text-sm text-muted">
                       Версия {activeProfile.profileVersion}
                     </span>
                   </div>
