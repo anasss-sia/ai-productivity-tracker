@@ -157,25 +157,6 @@ export default function FocusPage() {
     }
   }
 
-  async function markTaskInProgress() {
-    if (!taskId) return;
-
-    const token = getToken();
-
-    if (!token) return;
-
-    await fetch(`/api/tasks/${taskId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        status: "IN_PROGRESS",
-      }),
-    });
-  }
-
   function runTimer() {
     stopTimer();
 
@@ -222,8 +203,6 @@ export default function FocusPage() {
 
   async function startSession() {
     if (!validateSettings()) return;
-
-    await markTaskInProgress();
 
     stopTimer();
 

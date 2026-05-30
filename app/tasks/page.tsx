@@ -146,6 +146,8 @@ export default function TasksPage() {
   }
 
   async function deleteTask(taskId: number) {
+    setMessage("");
+
     const token = getToken();
 
     if (!token) {
@@ -153,12 +155,21 @@ export default function TasksPage() {
       return;
     }
 
-    await fetch(`/api/tasks/${taskId}`, {
+    const response = await fetch(`/api/tasks/${taskId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMessage(data.error || "Ошибка удаления задачи");
+      return;
+    }
+
+    setMessage(data.message || "Задача удалена");
 
     await loadTasks();
   }

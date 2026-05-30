@@ -105,7 +105,6 @@ const chartColors = {
   axis: "#3E3630",
   fill: "#A79A8A",
   fillDark: "#3E3630",
-  track: "#F8F8F8",
 };
 
 function EmptyChart() {
@@ -242,26 +241,6 @@ function HourChart({ data }: { data: HourPoint[] }) {
   );
 }
 
-function MiniGauge({ value }: { value: number }) {
-  const safeValue = Math.max(0, Math.min(value, 100));
-
-  return (
-    <div className="relative size-28 rounded-full bg-background">
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: `conic-gradient(${chartColors.fillDark} ${
-            safeValue * 3.6
-          }deg, ${chartColors.track} 0deg)`,
-        }}
-      />
-      <div className="absolute inset-3 flex items-center justify-center rounded-full bg-surface">
-        <span className="text-xl font-bold text-foreground">{safeValue}%</span>
-      </div>
-    </div>
-  );
-}
-
 export default function AnalyticsPage() {
   const router = useRouter();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -349,33 +328,12 @@ export default function AnalyticsPage() {
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <section className="mb-8 rounded-2xl border border-border bg-surface p-7 shadow-sm">
           <p className="text-sm font-medium text-accent-strong">Аналитика и фокус-профиль</p>
-          <div className="mt-3 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-            <div>
-              <h1 className="text-4xl font-bold sm:text-5xl">Аналитика</h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                Основные показатели продуктивности, графики фокус-времени и
-                персональные AI-рекомендации по нажатию кнопки.
-              </p>
-            </div>
-
-            {analytics && (
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  ["Фокус", `${analytics.totalFocusMinutes} мин`],
-                  ["Циклы", `${Math.round(analytics.completionRate)}%`],
-                  ["Сессии", analytics.completedSessions],
-                  ["Лучшее время", analytics.bestFocusTimeRange ?? "нет данных"],
-                ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="rounded-xl border border-border bg-surface p-4"
-                  >
-                    <p className="text-xs text-muted">{label}</p>
-                    <p className="mt-2 text-xl font-bold text-foreground">{value}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="mt-3">
+            <h1 className="text-4xl font-bold sm:text-5xl">Аналитика</h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-muted">
+              Основные показатели продуктивности, графики фокус-времени и
+              персональные AI-рекомендации по нажатию кнопки.
+            </p>
           </div>
         </section>
 
@@ -409,7 +367,7 @@ export default function AnalyticsPage() {
               ))}
             </section>
 
-            <section className="mt-6 grid gap-4 md:grid-cols-3">
+            <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
                 <p className="text-sm text-muted">Завершение циклов</p>
                 <p className="mt-3 text-4xl font-bold text-foreground">
@@ -430,17 +388,18 @@ export default function AnalyticsPage() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-5 shadow-sm">
-                <div>
-                  <p className="text-sm text-muted">Лучшее время дня</p>
-                  <p className="mt-3 text-3xl font-bold text-foreground">
-                    {analytics.bestFocusTimeRange ?? "нет данных"}
-                  </p>
-                  <p className="mt-2 text-sm text-muted">
-                    Средняя продуктивность: {analytics.averageProductivityScore}%
-                  </p>
-                </div>
-                <MiniGauge value={analytics.averageProductivityScore} />
+              <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+                <p className="text-sm text-muted">Лучшее время дня</p>
+                <p className="mt-3 text-3xl font-bold text-foreground">
+                  {analytics.bestFocusTimeRange ?? "нет данных"}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+                <p className="text-sm text-muted">Средняя продуктивность</p>
+                <p className="mt-3 text-4xl font-bold text-foreground">
+                  {analytics.averageProductivityScore}%
+                </p>
               </div>
             </section>
 

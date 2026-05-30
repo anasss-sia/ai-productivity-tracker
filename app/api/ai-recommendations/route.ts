@@ -1,4 +1,7 @@
-import { createProductivityMetricSnapshot } from "@/app/lib/analytics";
+import {
+  createProductivityMetricSnapshot,
+  getUserSessions,
+} from "@/app/lib/analytics";
 import { getApiErrorMessage, getApiErrorStatus } from "@/app/lib/api-errors";
 import { getUserIdFromRequest } from "@/app/lib/auth";
 import { generateAiProfile } from "@/app/lib/openai";
@@ -54,8 +57,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { metric, analytics, sessions } = await createProductivityMetricSnapshot(userId);
-    const completedSessions = sessions.filter(
+    const existingSessions = await getUserSessions(userId);
+    const completedSessions = existingSessions.filter(
       (session) => session.completedCycles >= session.plannedCycles
     );
 
@@ -71,6 +74,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const { metric, analytics, sessions } = await createProductivityMetricSnapshot(userId);
     const promptPreviewContext = {
       analytics,
       sessions: sessions.slice(0, 20),

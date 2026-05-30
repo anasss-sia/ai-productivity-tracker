@@ -91,6 +91,13 @@ export async function PATCH(
       data,
     });
 
+    if (task.count === 0) {
+      return Response.json(
+        { error: "Задача не найдена" },
+        { status: 404 }
+      );
+    }
+
     return Response.json(task);
   } catch (error) {
     console.error("TASK_PATCH_ERROR", error);
@@ -118,12 +125,19 @@ export async function DELETE(
 
     const { id } = await params;
 
-    await prisma.task.deleteMany({
+    const task = await prisma.task.deleteMany({
       where: {
         id: Number(id),
         userId,
       },
     });
+
+    if (task.count === 0) {
+      return Response.json(
+        { error: "Задача не найдена" },
+        { status: 404 }
+      );
+    }
 
     return Response.json({
       message: "Задача удалена",

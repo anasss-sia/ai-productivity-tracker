@@ -1,4 +1,4 @@
-import type { SessionForAnalytics } from "@/app/lib/analytics";
+import { getAnalyticsHour, type SessionForAnalytics } from "@/app/lib/analytics";
 
 type AiContext = {
   analytics: ReturnType<typeof import("@/app/lib/analytics").calculateAnalytics>;
@@ -88,7 +88,7 @@ export function buildPromptSnapshot(context: AiContext) {
     duration: session.duration,
     interruptions: session.interruptions,
     productivityScore: session.productivityScore,
-    startHour: session.startTime.getHours(),
+    startHour: getAnalyticsHour(session.startTime),
   }));
 
   return [

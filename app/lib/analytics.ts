@@ -20,6 +20,16 @@ type ModeCount = {
   count: number;
 };
 
+const analyticsTimeZone = "Europe/Moscow";
+const datePartsFormatter = new Intl.DateTimeFormat("ru-RU", {
+  timeZone: analyticsTimeZone,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  hourCycle: "h23",
+});
+
 export function clampScore(value: number) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
@@ -46,8 +56,27 @@ function average(numbers: number[], digits = 0) {
   return Number(value.toFixed(digits));
 }
 
+function getAnalyticsDateParts(date: Date) {
+  const parts = Object.fromEntries(
+    datePartsFormatter.formatToParts(date).map((part) => [part.type, part.value])
+  );
+
+  return {
+    year: parts.year ?? "0000",
+    month: parts.month ?? "00",
+    day: parts.day ?? "00",
+    hour: Number(parts.hour ?? 0),
+  };
+}
+
+export function getAnalyticsHour(date: Date) {
+  return getAnalyticsDateParts(date).hour;
+}
+
 function formatDateKey(date: Date) {
-  return date.toISOString().slice(0, 10);
+  const parts = getAnalyticsDateParts(date);
+
+  return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
 function formatHourRange(hour: number | null) {
@@ -101,7 +130,7 @@ export function calculateAnalytics(sessions: SessionForAnalytics[]) {
   >();
 
   completedSessionsList.forEach((session) => {
-    const hour = session.startTime.getHours();
+    const hour = getAnalyticsHour(session.startTime);
     const current = hourly.get(hour) ?? {
       sessions: 0,
       minutes: 0,
@@ -121,8 +150,7 @@ export function calculateAnalytics(sessions: SessionForAnalytics[]) {
   let bestHourScore = Number.NEGATIVE_INFINITY;
 
   hourly.forEach((value, hour) => {
-    const weightedScore =
-      value.score / value.sessions - (value.interruptions / value.sessions) * 5 + value.minutes / 60;
+    const weightedScore = value.score / value.sessions + value.minutes / 60;
 
     if (weightedScore > bestHourScore) {
       bestHourScore = weightedScore;
