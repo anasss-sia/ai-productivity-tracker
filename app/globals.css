@@ -1,13 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f8f8f8;
+  --foreground: #3e3630;
+  --surface: #edebe0;
+  --cool: #e0e3ed;
+  --accent: #c7d3db;
+  --accent-strong: #a79a8a;
+  --border: #b2b4b7;
+  --muted: #6f675f;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-cool: var(--cool);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
   --font-sans: Arial, Helvetica, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
@@ -23,5 +35,17 @@ a,
 input,
 select,
 textarea {
-  outline-color: #0f172a;
+  outline-color: var(--foreground);
+}
+
+input,
+select,
+textarea {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--foreground);
 }

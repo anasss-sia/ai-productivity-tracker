@@ -47,14 +47,14 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
       <form
         onSubmit={handleLogin}
-        className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+        className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-border bg-surface p-6 shadow-sm"
       >
         <div>
-          <h1 className="text-2xl font-bold text-slate-950">Вход</h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <h1 className="text-2xl font-bold text-foreground">Вход</h1>
+          <p className="mt-2 text-sm text-muted">
             Войдите, чтобы продолжить работу с задачами и аналитикой.
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function LoginPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-slate-300 p-3"
+          className="rounded-lg border border-border p-3"
         />
 
         <input
@@ -72,22 +72,22 @@ export default function LoginPage() {
           placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-lg border border-slate-300 p-3"
+          className="rounded-lg border border-border p-3"
         />
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-slate-950 p-3 font-medium text-white disabled:bg-slate-400"
+          className="rounded-lg bg-foreground p-3 font-medium text-background disabled:bg-border"
         >
           {isSubmitting ? "Вход..." : "Войти"}
         </button>
 
         {message && <p className="text-sm text-red-600">{message}</p>}
 
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           Нет аккаунта?{" "}
-          <Link href="/register" className="font-medium text-slate-950">
+          <Link href="/register" className="font-medium text-foreground">
             Зарегистрироваться
           </Link>
         </p>

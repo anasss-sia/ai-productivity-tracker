@@ -172,13 +172,13 @@ export default function TasksPage() {
   }, [loadTasks]);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-background">
       <TopNav />
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <section className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-950">Задачи</h1>
-          <p className="mt-2 max-w-2xl text-slate-600">
+          <h1 className="text-3xl font-bold text-foreground">Задачи</h1>
+          <p className="mt-2 max-w-2xl text-muted">
             Создавайте задачи, задавайте приоритет и обновляйте статус перед
             запуском фокус-сессии.
           </p>
@@ -187,9 +187,9 @@ export default function TasksPage() {
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           <form
             onSubmit={createTask}
-            className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+            className="rounded-lg border border-border bg-surface p-6 shadow-sm"
           >
-            <h2 className="text-xl font-semibold text-slate-950">Новая задача</h2>
+            <h2 className="text-xl font-semibold text-foreground">Новая задача</h2>
 
             <div className="mt-5 grid gap-4">
               <input
@@ -197,20 +197,20 @@ export default function TasksPage() {
                 placeholder="Название задачи"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="rounded-lg border border-slate-300 p-3"
+                className="rounded-lg border border-border p-3"
               />
 
               <textarea
                 placeholder="Описание"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-28 rounded-lg border border-slate-300 p-3"
+                className="min-h-28 rounded-lg border border-border p-3"
               />
 
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                className="rounded-lg border border-slate-300 p-3"
+                className="rounded-lg border border-border p-3"
               >
                 <option value="LOW">Низкий приоритет</option>
                 <option value="MEDIUM">Средний приоритет</option>
@@ -219,34 +219,34 @@ export default function TasksPage() {
 
               <button
                 type="submit"
-                className="rounded-lg bg-slate-950 p-3 font-medium text-white hover:bg-slate-800"
+                className="rounded-lg bg-foreground p-3 font-medium text-background hover:bg-muted"
               >
                 Создать задачу
               </button>
             </div>
 
-            {message && <p className="mt-4 text-sm text-slate-600">{message}</p>}
+            {message && <p className="mt-4 text-sm text-muted">{message}</p>}
           </form>
 
           <section className="grid gap-4">
             {tasks.length === 0 ? (
-              <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600">
+              <div className="rounded-lg border border-border bg-surface p-8 text-center text-muted">
                 Пока нет задач. Создайте первую задачу для фокус-сессии.
               </div>
             ) : (
               tasks.map((task) => (
                 <article
                   key={task.id}
-                  className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-surface p-5 shadow-sm"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
-                      <h2 className="text-xl font-semibold text-slate-950">
+                      <h2 className="text-xl font-semibold text-foreground">
                         {task.title}
                       </h2>
 
                       {task.description && (
-                        <p className="mt-2 text-sm leading-6 text-slate-600">
+                        <p className="mt-2 text-sm leading-6 text-muted">
                           {task.description}
                         </p>
                       )}
@@ -255,17 +255,17 @@ export default function TasksPage() {
                     <button
                       type="button"
                       onClick={() => setEditingTask(task)}
-                      className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                      className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted hover:bg-cool"
                     >
                       Редактировать
                     </button>
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2 text-sm">
-                    <span className="rounded-lg bg-slate-100 px-3 py-1 text-slate-700">
+                    <span className="rounded-lg bg-cool px-3 py-1 text-muted">
                       {statusLabels[task.status]}
                     </span>
-                    <span className="rounded-lg bg-slate-100 px-3 py-1 text-slate-700">
+                    <span className="rounded-lg bg-cool px-3 py-1 text-muted">
                       {priorityLabels[task.priority]} приоритет
                     </span>
                   </div>
@@ -278,7 +278,7 @@ export default function TasksPage() {
                         onClick={() =>
                           updateTask(task.id, { status: status as TaskStatus })
                         }
-                        className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                        className="rounded-lg border border-border px-3 py-2 text-sm text-muted hover:bg-cool"
                       >
                         {statusLabels[status as TaskStatus]}
                       </button>
@@ -287,7 +287,7 @@ export default function TasksPage() {
                     <button
                       type="button"
                       onClick={() => deleteTask(task.id)}
-                      className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
+                      className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-background hover:bg-red-700"
                     >
                       Удалить
                     </button>
@@ -299,12 +299,12 @@ export default function TasksPage() {
         </div>
 
         {editingTask && (
-          <div className="fixed inset-0 z-20 flex items-center justify-center bg-slate-950/50 px-4">
+          <div className="fixed inset-0 z-20 flex items-center justify-center bg-foreground/50 px-4">
             <form
               onSubmit={saveEditedTask}
-              className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl"
+              className="w-full max-w-lg rounded-lg bg-surface p-6 shadow-xl"
             >
-              <h2 className="text-xl font-semibold text-slate-950">
+              <h2 className="text-xl font-semibold text-foreground">
                 Редактирование задачи
               </h2>
 
@@ -315,7 +315,7 @@ export default function TasksPage() {
                   onChange={(e) =>
                     setEditingTask({ ...editingTask, title: e.target.value })
                   }
-                  className="rounded-lg border border-slate-300 p-3"
+                  className="rounded-lg border border-border p-3"
                 />
 
                 <textarea
@@ -326,7 +326,7 @@ export default function TasksPage() {
                       description: e.target.value,
                     })
                   }
-                  className="min-h-28 rounded-lg border border-slate-300 p-3"
+                  className="min-h-28 rounded-lg border border-border p-3"
                 />
 
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -338,7 +338,7 @@ export default function TasksPage() {
                         status: e.target.value as TaskStatus,
                       })
                     }
-                    className="rounded-lg border border-slate-300 p-3"
+                    className="rounded-lg border border-border p-3"
                   >
                     {Object.entries(statusLabels).map(([value, label]) => (
                       <option key={value} value={value}>
@@ -355,7 +355,7 @@ export default function TasksPage() {
                         priority: e.target.value as TaskPriority,
                       })
                     }
-                    className="rounded-lg border border-slate-300 p-3"
+                    className="rounded-lg border border-border p-3"
                   >
                     {Object.entries(priorityLabels).map(([value, label]) => (
                       <option key={value} value={value}>
@@ -369,14 +369,14 @@ export default function TasksPage() {
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button
                   type="submit"
-                  className="rounded-lg bg-slate-950 px-4 py-3 font-medium text-white"
+                  className="rounded-lg bg-foreground px-4 py-3 font-medium text-background"
                 >
                   Сохранить
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingTask(null)}
-                  className="rounded-lg border border-slate-200 px-4 py-3 font-medium text-slate-700"
+                  className="rounded-lg border border-border px-4 py-3 font-medium text-muted"
                 >
                   Отмена
                 </button>

@@ -102,23 +102,23 @@ function priorityClassName(priority: string) {
 }
 
 const chartColors = {
-  axis: "#0f2f24",
-  fill: "#8faa91",
-  fillLight: "#b9d7bd",
-  fillDark: "#5f765f",
-  track: "#e9ede6",
+  axis: "#3E3630",
+  fill: "#C7D3DB",
+  fillLight: "#E0E3ED",
+  fillDark: "#A79A8A",
+  track: "#F8F8F8",
 };
 
 const chartFills = [
   chartColors.fill,
-  chartColors.fillLight,
   chartColors.fillDark,
-  "#a6b99e",
+  "#B2B4B7",
+  chartColors.fillLight,
 ];
 
 function EmptyChart() {
   return (
-    <div className="flex h-full min-h-44 w-full items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">
+    <div className="flex h-full min-h-44 w-full items-center justify-center rounded-xl bg-cool text-sm text-muted">
       Недостаточно данных
     </div>
   );
@@ -165,7 +165,7 @@ function BarChart({ data }: { data: ChartPoint[] }) {
   const max = Math.max(...data.map((item) => item.minutes), 1);
 
   return (
-    <div className="mt-5 rounded-xl bg-slate-50 p-4">
+    <div className="mt-5 rounded-xl bg-cool p-4">
       {data.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -178,7 +178,7 @@ function BarChart({ data }: { data: ChartPoint[] }) {
                 color={chartFills[index % chartFills.length]}
                 title={`${item.minutes} мин`}
               />
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-medium text-muted">
                 {formatDate(item.date)}
               </span>
             </div>
@@ -193,7 +193,7 @@ function CycleChart({ data }: { data: CyclePoint[] }) {
   const chartData = data.slice(-8);
 
   return (
-    <div className="mt-5 rounded-xl bg-slate-50 p-4">
+    <div className="mt-5 rounded-xl bg-cool p-4">
       {chartData.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -206,7 +206,7 @@ function CycleChart({ data }: { data: CyclePoint[] }) {
                 color={chartFills[index % chartFills.length]}
                 title={`${item.completedCycles}/${item.plannedCycles} циклов`}
               />
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-medium text-muted">
                 {item.completedCycles}/{item.plannedCycles}
               </span>
             </div>
@@ -222,12 +222,12 @@ function HourChart({ data }: { data: HourPoint[] }) {
   const max = Math.max(...activeHours.map((item) => item.score), 1);
 
   return (
-    <div className="mt-5 rounded-xl bg-slate-50 p-4">
+    <div className="mt-5 rounded-xl bg-cool p-4">
       {activeHours.length === 0 ? (
         <EmptyChart />
       ) : (
         <div className="grid h-52 grid-cols-[2rem_1fr] gap-3">
-          <div className="flex flex-col justify-between pb-8 text-xs text-slate-400">
+          <div className="flex flex-col justify-between pb-8 text-xs text-border">
             <span>{max}</span>
             <span>{Math.round(max / 2)}</span>
             <span>0</span>
@@ -242,7 +242,7 @@ function HourChart({ data }: { data: HourPoint[] }) {
                   color={chartFills[index % chartFills.length]}
                   title={`${item.score} баллов`}
                 />
-                <span className="text-xs font-medium text-slate-500">
+                <span className="text-xs font-medium text-muted">
                   {item.label.slice(0, 2)}
                 </span>
               </div>
@@ -258,17 +258,17 @@ function MiniGauge({ value }: { value: number }) {
   const safeValue = Math.max(0, Math.min(value, 100));
 
   return (
-    <div className="relative size-28 rounded-full bg-slate-100">
+    <div className="relative size-28 rounded-full bg-cool">
       <div
         className="absolute inset-0 rounded-full"
         style={{
-          background: `conic-gradient(${chartColors.fill} ${
+          background: `conic-gradient(${chartColors.fillDark} ${
             safeValue * 3.6
           }deg, ${chartColors.track} 0deg)`,
         }}
       />
-      <div className="absolute inset-3 flex items-center justify-center rounded-full bg-white">
-        <span className="text-xl font-bold text-slate-950">{safeValue}%</span>
+      <div className="absolute inset-3 flex items-center justify-center rounded-full bg-surface">
+        <span className="text-xl font-bold text-foreground">{safeValue}%</span>
       </div>
     </div>
   );
@@ -355,16 +355,40 @@ export default function AnalyticsPage() {
   }, [loadAnalytics]);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-background">
       <TopNav />
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <section className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-950">Аналитика</h1>
-          <p className="mt-2 max-w-3xl text-slate-600">
-            Основные показатели продуктивности, простые графики и персональные
-            AI-рекомендации по нажатию кнопки.
-          </p>
+        <section className="mb-8 rounded-2xl border border-border bg-foreground p-7 text-background shadow-sm">
+          <p className="text-sm font-medium text-accent">Аналитика и фокус-профиль</p>
+          <div className="mt-3 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+            <div>
+              <h1 className="text-4xl font-bold sm:text-5xl">Аналитика</h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-accent">
+                Основные показатели продуктивности, графики фокус-времени и
+                персональные AI-рекомендации по нажатию кнопки.
+              </p>
+            </div>
+
+            {analytics && (
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  ["Фокус", `${analytics.totalFocusMinutes} мин`],
+                  ["Циклы", `${Math.round(analytics.completionRate)}%`],
+                  ["Сессии", analytics.completedSessions],
+                  ["Лучшее время", analytics.bestFocusTimeRange ?? "нет данных"],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-xl border border-background/15 bg-background/10 p-4"
+                  >
+                    <p className="text-xs text-accent">{label}</p>
+                    <p className="mt-2 text-xl font-bold text-background">{value}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </section>
 
         {message && (
@@ -374,7 +398,7 @@ export default function AnalyticsPage() {
         )}
 
         {!analytics ? (
-          <div className="rounded-lg border border-slate-200 bg-white p-10 text-center text-slate-600 shadow-sm">
+          <div className="rounded-lg border border-border bg-surface p-10 text-center text-muted shadow-sm">
             Загрузка аналитики...
           </div>
         ) : (
@@ -388,43 +412,43 @@ export default function AnalyticsPage() {
               ].map(([label, value, unit]) => (
                 <div
                   key={label}
-                  className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+                  className="rounded-xl border border-border bg-surface p-5 shadow-sm"
                 >
-                  <p className="text-sm text-slate-500">{label}</p>
-                  <p className="mt-3 text-4xl font-bold text-slate-950">{value}</p>
-                  {unit && <p className="mt-1 text-sm text-slate-500">{unit}</p>}
+                  <p className="text-sm text-muted">{label}</p>
+                  <p className="mt-3 text-4xl font-bold text-foreground">{value}</p>
+                  {unit && <p className="mt-1 text-sm text-muted">{unit}</p>}
                 </div>
               ))}
             </section>
 
             <section className="mt-6 grid gap-4 md:grid-cols-3">
-              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">Завершение циклов</p>
-                <p className="mt-3 text-4xl font-bold text-slate-950">
+              <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+                <p className="text-sm text-muted">Завершение циклов</p>
+                <p className="mt-3 text-4xl font-bold text-foreground">
                   {Math.round(analytics.completionRate)}%
                 </p>
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-sm text-muted">
                   {analytics.totalCompletedCycles} из {analytics.totalPlannedCycles}
                 </p>
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">Средние прерывания</p>
-                <p className="mt-3 text-4xl font-bold text-slate-950">
+              <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+                <p className="text-sm text-muted">Средние прерывания</p>
+                <p className="mt-3 text-4xl font-bold text-foreground">
                   {analytics.averageInterruptions}
                 </p>
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-sm text-muted">
                   Всего: {analytics.totalInterruptions}
                 </p>
               </div>
 
-              <div className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-5 shadow-sm">
                 <div>
-                  <p className="text-sm text-slate-500">Лучшее время дня</p>
-                  <p className="mt-3 text-3xl font-bold text-slate-950">
+                  <p className="text-sm text-muted">Лучшее время дня</p>
+                  <p className="mt-3 text-3xl font-bold text-foreground">
                     {analytics.bestFocusTimeRange ?? "нет данных"}
                   </p>
-                  <p className="mt-2 text-sm text-slate-500">
+                  <p className="mt-2 text-sm text-muted">
                     Средняя продуктивность: {analytics.averageProductivityScore}%
                   </p>
                 </div>
@@ -433,35 +457,35 @@ export default function AnalyticsPage() {
             </section>
 
             <section className="mt-6 grid gap-4 xl:grid-cols-3">
-              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 className="text-lg font-semibold text-slate-950">
+              <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+                <h2 className="text-lg font-semibold text-foreground">
                   Фокус-время по дням
                 </h2>
                 <BarChart data={analytics.charts.dailyFocus} />
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 className="text-lg font-semibold text-slate-950">
+              <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+                <h2 className="text-lg font-semibold text-foreground">
                   Завершение циклов
                 </h2>
                 <CycleChart data={analytics.charts.cycleCompletion} />
               </div>
 
-              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 className="text-lg font-semibold text-slate-950">
+              <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+                <h2 className="text-lg font-semibold text-foreground">
                   Продуктивность по часам
                 </h2>
                 <HourChart data={analytics.charts.hourlyProductivity} />
               </div>
             </section>
 
-            <section className="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="mt-6 rounded-xl border border-border bg-surface p-6 shadow-sm">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-950">
+                  <h2 className="text-2xl font-bold text-foreground">
                     Индивидуальный фокус-профиль
                   </h2>
-                  <p className="mt-2 max-w-2xl text-slate-600">
+                  <p className="mt-2 max-w-2xl text-muted">
                     Для первичного профиля нужно минимум 3 завершённые
                     фокус-сессии. Генерация запускается вручную.
                   </p>
@@ -471,7 +495,7 @@ export default function AnalyticsPage() {
                   type="button"
                   onClick={generateRecommendations}
                   disabled={isGenerating}
-                  className="rounded-lg bg-slate-950 px-5 py-3 font-medium text-white disabled:bg-slate-400"
+                  className="rounded-lg bg-foreground px-5 py-3 font-medium text-background disabled:bg-border"
                 >
                   {isGenerating ? "Генерация..." : "Сгенерировать рекомендации"}
                 </button>
@@ -481,7 +505,7 @@ export default function AnalyticsPage() {
                 <div
                   className={`mt-5 rounded-lg border p-4 ${
                     aiResult
-                      ? "border-slate-200 bg-slate-50 text-slate-700"
+                      ? "border-border bg-background text-muted"
                       : "border-red-200 bg-red-50 text-red-700"
                   }`}
                 >
@@ -492,10 +516,10 @@ export default function AnalyticsPage() {
               {activeProfile ? (
                 <div className="mt-6">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <h3 className="text-xl font-bold text-slate-950">
+                    <h3 className="text-xl font-bold text-foreground">
                       Фокус-профиль
                     </h3>
-                    <span className="rounded-lg bg-slate-100 px-3 py-1 text-sm text-slate-600">
+                    <span className="rounded-lg bg-cool px-3 py-1 text-sm text-muted">
                       Версия {activeProfile.profileVersion}
                     </span>
                   </div>
@@ -507,33 +531,33 @@ export default function AnalyticsPage() {
                       ["Лучшее время", activeProfile.peakHours ?? "нет данных", ""],
                       ["Стабильность", activeProfile.focusStability ?? 0, "%"],
                     ].map(([label, value, unit]) => (
-                      <div key={label} className="rounded-lg bg-slate-50 p-4">
-                        <p className="text-sm text-slate-500">{label}</p>
-                        <p className="mt-2 text-2xl font-bold text-slate-950">
+                      <div key={label} className="rounded-lg bg-background p-4">
+                        <p className="text-sm text-muted">{label}</p>
+                        <p className="mt-2 text-2xl font-bold text-foreground">
                           {value}
                         </p>
-                        {unit && <p className="text-sm text-slate-500">{unit}</p>}
+                        {unit && <p className="text-sm text-muted">{unit}</p>}
                       </div>
                     ))}
                   </div>
 
                   {activeProfile.summary && (
-                    <p className="mt-5 leading-7 text-slate-600">
+                    <p className="mt-5 leading-7 text-muted">
                       {activeProfile.summary}
                     </p>
                   )}
                 </div>
               ) : (
-                <div className="mt-6 rounded-lg bg-slate-50 p-5 text-slate-600">
+                <div className="mt-6 rounded-lg bg-background p-5 text-muted">
                   Фокус-профиль ещё не сформирован.
                 </div>
               )}
 
               <div className="mt-6">
-                <h3 className="text-xl font-bold text-slate-950">AI-рекомендации</h3>
+                <h3 className="text-xl font-bold text-foreground">AI-рекомендации</h3>
 
                 {activeRecommendations.length === 0 ? (
-                  <div className="mt-4 rounded-lg bg-slate-50 p-5 text-slate-600">
+                  <div className="mt-4 rounded-lg bg-background p-5 text-muted">
                     Активных рекомендаций пока нет.
                   </div>
                 ) : (
@@ -541,10 +565,10 @@ export default function AnalyticsPage() {
                     {activeRecommendations.map((recommendation) => (
                       <article
                         key={recommendation.id}
-                        className="rounded-lg border border-slate-200 p-5"
+                        className="rounded-lg border border-border p-5"
                       >
                         <div className="mb-3 flex items-start justify-between gap-3">
-                          <h4 className="font-semibold text-slate-950">
+                          <h4 className="font-semibold text-foreground">
                             {recommendation.title}
                           </h4>
 
@@ -557,7 +581,7 @@ export default function AnalyticsPage() {
                           </span>
                         </div>
 
-                        <p className="leading-6 text-slate-600">
+                        <p className="leading-6 text-muted">
                           {recommendation.description}
                         </p>
                       </article>

@@ -21,9 +21,9 @@ export function TopNav() {
   }
 
   return (
-    <header className="border-b border-slate-200 bg-white/95">
+    <header className="border-b border-border bg-surface/95">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-        <Link href="/dashboard" className="text-lg font-bold text-slate-950">
+        <Link href="/dashboard" className="text-lg font-bold text-foreground">
           AI Productivity Tracker
         </Link>
 
@@ -38,8 +38,8 @@ export function TopNav() {
                   href={item.href}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                     isActive
-                      ? "bg-slate-950 text-white"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                      ? "bg-foreground text-background"
+                      : "text-muted hover:bg-cool hover:text-foreground"
                   }`}
                 >
                   {item.label}

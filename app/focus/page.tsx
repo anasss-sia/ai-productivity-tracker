@@ -343,30 +343,30 @@ export default function FocusPage() {
   const progress = Math.min((safeCompletedCycles / cycles) * 100, 100);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-background">
       <TopNav />
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <section className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-950">Фокус-сессия</h1>
-          <p className="mt-2 max-w-3xl text-slate-600">
+          <h1 className="text-3xl font-bold text-foreground">Фокус-сессия</h1>
+          <p className="mt-2 max-w-3xl text-muted">
             Выберите режим, укажите количество циклов, фиксируйте прерывания и
             сохраняйте результат для аналитики.
           </p>
         </section>
 
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-950">Настройки</h2>
+          <section className="rounded-lg border border-border bg-surface p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-foreground">Настройки</h2>
 
             <div className="mt-5 grid gap-4">
-              <label className="grid gap-2 text-sm font-medium text-slate-700">
+              <label className="grid gap-2 text-sm font-medium text-muted">
                 Задача
                 <select
                   value={taskId}
                   disabled={isStarted}
                   onChange={(e) => setTaskId(e.target.value)}
-                  className="rounded-lg border border-slate-300 p-3 disabled:bg-slate-100"
+                  className="rounded-lg border border-border p-3 disabled:bg-cool"
                 >
                   <option value="">Без задачи</option>
                   {tasks.map((task) => (
@@ -377,13 +377,13 @@ export default function FocusPage() {
                 </select>
               </label>
 
-              <label className="grid gap-2 text-sm font-medium text-slate-700">
+              <label className="grid gap-2 text-sm font-medium text-muted">
                 Режим работы
                 <select
                   value={mode}
                   disabled={isStarted}
                   onChange={(e) => changeMode(e.target.value as Mode)}
-                  className="rounded-lg border border-slate-300 p-3 disabled:bg-slate-100"
+                  className="rounded-lg border border-border p-3 disabled:bg-cool"
                 >
                   <option value="POMODORO_25_5">25/5</option>
                   <option value="DEEP_WORK_50_10">50/10</option>
@@ -392,7 +392,7 @@ export default function FocusPage() {
               </label>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <label className="grid gap-2 text-sm font-medium text-slate-700">
+                <label className="grid gap-2 text-sm font-medium text-muted">
                   Работа, мин
                   <input
                     type="text"
@@ -404,11 +404,11 @@ export default function FocusPage() {
                       setFocusDuration(value);
                       setTimeLeft(getValidNumber(value, 1) * 60);
                     }}
-                    className="rounded-lg border border-slate-300 p-3 disabled:bg-slate-100"
+                    className="rounded-lg border border-border p-3 disabled:bg-cool"
                   />
                 </label>
 
-                <label className="grid gap-2 text-sm font-medium text-slate-700">
+                <label className="grid gap-2 text-sm font-medium text-muted">
                   Перерыв, мин
                   <input
                     type="text"
@@ -418,11 +418,11 @@ export default function FocusPage() {
                     onChange={(e) =>
                       setBreakDuration(cleanPositiveNumber(e.target.value))
                     }
-                    className="rounded-lg border border-slate-300 p-3 disabled:bg-slate-100"
+                    className="rounded-lg border border-border p-3 disabled:bg-cool"
                   />
                 </label>
 
-                <label className="grid gap-2 text-sm font-medium text-slate-700">
+                <label className="grid gap-2 text-sm font-medium text-muted">
                   Циклы
                   <input
                     type="text"
@@ -432,36 +432,36 @@ export default function FocusPage() {
                     onChange={(e) =>
                       setPlannedCycles(cleanPositiveNumber(e.target.value))
                     }
-                    className="rounded-lg border border-slate-300 p-3 disabled:bg-slate-100"
+                    className="rounded-lg border border-border p-3 disabled:bg-cool"
                   />
                 </label>
               </div>
             </div>
           </section>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
-            <div className="inline-flex rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+          <section className="rounded-lg border border-border bg-surface p-6 text-center shadow-sm">
+            <div className="inline-flex rounded-lg bg-cool px-4 py-2 text-sm font-medium text-muted">
               {phase === "break" ? "Перерыв" : "Фокус"}
             </div>
 
-            <div className="mt-5 text-6xl font-bold text-slate-950 sm:text-7xl">
+            <div className="mt-5 text-6xl font-bold text-foreground sm:text-7xl">
               {formatTime(timeLeft)}
             </div>
 
-            <div className="mt-6 rounded-lg border border-slate-200 p-4">
-              <p className="text-sm text-slate-500">Завершено циклов</p>
-              <p className="mt-2 text-3xl font-bold text-slate-950">
+            <div className="mt-6 rounded-lg border border-border p-4">
+              <p className="text-sm text-muted">Завершено циклов</p>
+              <p className="mt-2 text-3xl font-bold text-foreground">
                 {safeCompletedCycles} / {cycles}
               </p>
 
-              <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-cool">
                 <div
-                  className="h-3 rounded-full bg-slate-900"
+                  className="h-3 rounded-full bg-foreground"
                   style={{ width: `${progress}%` }}
                 />
               </div>
 
-              <p className="mt-4 text-sm text-slate-600">
+              <p className="mt-4 text-sm text-muted">
                 Прерывания: {interruptions}
               </p>
             </div>
@@ -471,7 +471,7 @@ export default function FocusPage() {
                 <button
                   type="button"
                   onClick={startSession}
-                  className="rounded-lg bg-slate-950 p-3 font-medium text-white hover:bg-slate-800"
+                  className="rounded-lg bg-foreground p-3 font-medium text-background hover:bg-muted"
                 >
                   Запустить сессию
                 </button>
@@ -480,7 +480,7 @@ export default function FocusPage() {
                   <button
                     type="button"
                     onClick={addInterruption}
-                    className="rounded-lg border border-slate-200 p-3 font-medium text-slate-700 hover:bg-slate-100"
+                    className="rounded-lg border border-border p-3 font-medium text-muted hover:bg-cool"
                   >
                     Отметить прерывание
                   </button>
@@ -488,7 +488,7 @@ export default function FocusPage() {
                   <button
                     type="button"
                     onClick={finishEarly}
-                    className="rounded-lg bg-red-600 p-3 font-medium text-white hover:bg-red-700"
+                    className="rounded-lg bg-red-600 p-3 font-medium text-background hover:bg-red-700"
                   >
                     Завершить сессию
                   </button>
@@ -496,39 +496,39 @@ export default function FocusPage() {
               )}
             </div>
 
-            {message && <p className="mt-4 text-sm text-slate-600">{message}</p>}
+            {message && <p className="mt-4 text-sm text-muted">{message}</p>}
           </section>
         </div>
 
         <section className="mt-8">
-          <h2 className="text-2xl font-bold text-slate-950">История сессий</h2>
+          <h2 className="text-2xl font-bold text-foreground">История сессий</h2>
 
           <div className="mt-4 grid gap-3">
             {history.length === 0 ? (
-              <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">
+              <div className="rounded-lg border border-border bg-surface p-6 text-muted">
                 Сохранённых фокус-сессий пока нет.
               </div>
             ) : (
               history.map((session) => (
                 <article
                   key={session.id}
-                  className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]"
+                  className="grid gap-3 rounded-lg border border-border bg-surface p-4 shadow-sm md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]"
                 >
                   <div>
-                    <p className="font-semibold text-slate-950">
+                    <p className="font-semibold text-foreground">
                       {session.task?.title ?? "Без задачи"}
                     </p>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-muted">
                       {new Date(session.startTime).toLocaleString("ru-RU")}
                     </p>
                   </div>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-muted">
                     Режим: {modeLabels[session.mode as Mode] ?? session.mode}
                   </p>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-muted">
                     Циклы: {session.completedCycles}/{session.plannedCycles}
                   </p>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-muted">
                     Фокус: {session.duration ?? 0} мин, прерывания:{" "}
                     {session.interruptions}
                   </p>

@@ -40,14 +40,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
       <form
         onSubmit={handleRegister}
-        className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+        className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-border bg-surface p-6 shadow-sm"
       >
         <div>
-          <h1 className="text-2xl font-bold text-slate-950">Регистрация</h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <h1 className="text-2xl font-bold text-foreground">Регистрация</h1>
+          <p className="mt-2 text-sm text-muted">
             Создайте учётную запись для сохранения задач и фокус-сессий.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function RegisterPage() {
           placeholder="Имя"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="rounded-lg border border-slate-300 p-3"
+          className="rounded-lg border border-border p-3"
         />
 
         <input
@@ -65,7 +65,7 @@ export default function RegisterPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-slate-300 p-3"
+          className="rounded-lg border border-border p-3"
         />
 
         <input
@@ -73,26 +73,26 @@ export default function RegisterPage() {
           placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-lg border border-slate-300 p-3"
+          className="rounded-lg border border-border p-3"
         />
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-slate-950 p-3 font-medium text-white disabled:bg-slate-400"
+          className="rounded-lg bg-foreground p-3 font-medium text-background disabled:bg-border"
         >
           {isSubmitting ? "Регистрация..." : "Зарегистрироваться"}
         </button>
 
         {message && (
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted">
             {message}
           </p>
         )}
 
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           Уже есть аккаунт?{" "}
-          <Link href="/login" className="font-medium text-slate-950">
+          <Link href="/login" className="font-medium text-foreground">
             Войти
           </Link>
         </p>
