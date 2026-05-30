@@ -91,20 +91,20 @@ function priorityLabel(priority: string) {
 
 function priorityClassName(priority: string) {
   if (priority === "HIGH") {
-    return "bg-red-50 text-red-700 border-red-200";
+    return "border-accent-strong bg-background text-accent-strong";
   }
 
   if (priority === "LOW") {
-    return "bg-green-50 text-green-700 border-green-200";
+    return "border-border bg-background text-muted";
   }
 
-  return "bg-orange-50 text-orange-700 border-orange-200";
+  return "border-border bg-background text-foreground";
 }
 
 const chartColors = {
-  axis: "#3E3630",
-  fill: "#A79A8A",
-  fillDark: "#3E3630",
+  axis: "#000000",
+  fill: "#808080",
+  fillDark: "#000000",
 };
 
 function EmptyChart() {
@@ -338,7 +338,7 @@ export default function AnalyticsPage() {
         </section>
 
         {message && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          <div className="mb-6 rounded-lg border border-accent-strong bg-background p-4 text-accent-strong">
             {message}
           </div>
         )}
@@ -442,7 +442,7 @@ export default function AnalyticsPage() {
                   type="button"
                   onClick={generateRecommendations}
                   disabled={isGenerating}
-                  className="rounded-lg bg-foreground px-5 py-3 font-medium text-background disabled:bg-border"
+                  className="rounded-lg bg-accent px-5 py-3 font-medium text-background disabled:bg-border"
                 >
                   {isGenerating ? "Генерация..." : "Сгенерировать рекомендации"}
                 </button>
@@ -453,7 +453,7 @@ export default function AnalyticsPage() {
                   className={`mt-5 rounded-lg border p-4 ${
                     aiResult
                       ? "border-border bg-background text-muted"
-                      : "border-red-200 bg-red-50 text-red-700"
+                      : "border-accent-strong bg-background text-accent-strong"
                   }`}
                 >
                   {aiMessage}

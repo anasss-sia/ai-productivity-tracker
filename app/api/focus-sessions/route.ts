@@ -132,6 +132,18 @@ export async function POST(req: Request) {
       },
     });
 
+    if (taskId && safeCompletedCycles > 0) {
+      await prisma.task.updateMany({
+        where: {
+          id: taskId,
+          userId,
+        },
+        data: {
+          status: "IN_PROGRESS",
+        },
+      });
+    }
+
     await createProductivityMetricSnapshot(userId);
 
     return Response.json(session);

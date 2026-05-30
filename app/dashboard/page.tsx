@@ -77,7 +77,7 @@ export default function DashboardPage() {
               <p className="mt-2 min-h-12 text-sm leading-6 text-muted">
                 {item.description}
               </p>
-              <span className="mt-5 inline-flex rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background">
+              <span className="mt-5 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-medium text-background">
                 {item.action}
               </span>
             </Link>

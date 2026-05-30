@@ -157,6 +157,25 @@ export default function FocusPage() {
     }
   }
 
+  async function markTaskInProgress() {
+    if (!taskId) return;
+
+    const token = getToken();
+
+    if (!token) return;
+
+    await fetch(`/api/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        status: "IN_PROGRESS",
+      }),
+    });
+  }
+
   function runTimer() {
     stopTimer();
 
@@ -203,6 +222,8 @@ export default function FocusPage() {
 
   async function startSession() {
     if (!validateSettings()) return;
+
+    await markTaskInProgress();
 
     stopTimer();
 
@@ -435,7 +456,7 @@ export default function FocusPage() {
 
               <div className="mt-4 h-3 overflow-hidden rounded-full bg-background">
                 <div
-                  className="h-3 rounded-full bg-accent-strong"
+                  className="h-3 rounded-full bg-accent"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -450,7 +471,7 @@ export default function FocusPage() {
                 <button
                   type="button"
                   onClick={startSession}
-                  className="rounded-lg bg-foreground p-3 font-medium text-background hover:bg-muted"
+                  className="rounded-lg bg-accent p-3 font-medium text-background hover:bg-foreground"
                 >
                   Запустить сессию
                 </button>
@@ -467,7 +488,7 @@ export default function FocusPage() {
                   <button
                     type="button"
                     onClick={finishEarly}
-                    className="rounded-lg bg-accent p-3 font-medium text-background hover:bg-muted"
+                    className="rounded-lg bg-accent-strong p-3 font-medium text-background hover:bg-foreground"
                   >
                     Завершить сессию
                   </button>

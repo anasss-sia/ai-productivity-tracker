@@ -78,12 +78,12 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-foreground p-3 font-medium text-background disabled:bg-border"
+          className="rounded-lg bg-accent p-3 font-medium text-background disabled:bg-border"
         >
           {isSubmitting ? "Вход..." : "Войти"}
         </button>
 
-        {message && <p className="text-sm text-red-600">{message}</p>}
+        {message && <p className="text-sm text-accent-strong">{message}</p>}
 
         <p className="text-sm text-muted">
           Нет аккаунта?{" "}

@@ -38,7 +38,7 @@ export function TopNav() {
                   href={item.href}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                     isActive
-                      ? "bg-foreground text-background"
+                      ? "bg-accent text-background"
                       : "text-muted hover:bg-background hover:text-foreground"
                   }`}
                 >
@@ -51,7 +51,7 @@ export function TopNav() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-fit rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:border-red-300 hover:bg-red-100"
+            className="w-fit rounded-lg bg-accent-strong px-3 py-2 text-sm font-medium text-background transition hover:bg-foreground"
           >
             Выйти
           </button>

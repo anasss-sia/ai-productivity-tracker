@@ -17,7 +17,7 @@ export default function Home() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/login"
-                className="rounded-lg bg-foreground px-5 py-3 text-center font-medium text-background hover:bg-muted"
+                className="rounded-lg bg-accent px-5 py-3 text-center font-medium text-background hover:bg-foreground"
               >
                 Войти
               </Link>
