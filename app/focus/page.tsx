@@ -392,7 +392,7 @@ export default function FocusPage() {
               </label>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <label className="grid gap-2 text-sm font-medium text-muted">
+                <label className="grid min-w-0 gap-2 text-sm font-medium text-muted">
                   Работа, мин
                   <input
                     type="text"
@@ -408,7 +408,7 @@ export default function FocusPage() {
                   />
                 </label>
 
-                <label className="grid gap-2 text-sm font-medium text-muted">
+                <label className="grid min-w-0 gap-2 text-sm font-medium text-muted">
                   Перерыв, мин
                   <input
                     type="text"
@@ -422,7 +422,7 @@ export default function FocusPage() {
                   />
                 </label>
 
-                <label className="grid gap-2 text-sm font-medium text-muted">
+                <label className="grid min-w-0 gap-2 text-sm font-medium text-muted">
                   Циклы
                   <input
                     type="text"
@@ -439,8 +439,8 @@ export default function FocusPage() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-border bg-surface p-6 text-center shadow-sm">
-            <div className="inline-flex rounded-lg bg-cool px-4 py-2 text-sm font-medium text-muted">
+          <section className="rounded-lg border border-border bg-cool p-6 text-center shadow-sm">
+            <div className="inline-flex rounded-lg bg-surface px-4 py-2 text-sm font-medium text-muted">
               {phase === "break" ? "Перерыв" : "Фокус"}
             </div>
 
@@ -448,15 +448,15 @@ export default function FocusPage() {
               {formatTime(timeLeft)}
             </div>
 
-            <div className="mt-6 rounded-lg border border-border p-4">
+            <div className="mt-6 rounded-lg border border-border bg-surface p-4">
               <p className="text-sm text-muted">Завершено циклов</p>
               <p className="mt-2 text-3xl font-bold text-foreground">
                 {safeCompletedCycles} / {cycles}
               </p>
 
-              <div className="mt-4 h-3 overflow-hidden rounded-full bg-cool">
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-background">
                 <div
-                  className="h-3 rounded-full bg-foreground"
+                  className="h-3 rounded-full bg-accent-strong"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -480,7 +480,7 @@ export default function FocusPage() {
                   <button
                     type="button"
                     onClick={addInterruption}
-                    className="rounded-lg border border-border p-3 font-medium text-muted hover:bg-cool"
+                    className="rounded-lg border border-border bg-surface p-3 font-medium text-muted hover:bg-background"
                   >
                     Отметить прерывание
                   </button>
@@ -488,7 +488,7 @@ export default function FocusPage() {
                   <button
                     type="button"
                     onClick={finishEarly}
-                    className="rounded-lg bg-red-600 p-3 font-medium text-background hover:bg-red-700"
+                    className="rounded-lg bg-accent-strong p-3 font-medium text-background hover:bg-muted"
                   >
                     Завершить сессию
                   </button>

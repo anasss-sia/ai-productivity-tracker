@@ -109,7 +109,7 @@ export default function DashboardPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-lg border border-border bg-surface p-6 shadow-sm transition hover:border-border hover:shadow-md"
+              className="rounded-lg border border-border bg-cool p-6 shadow-sm transition hover:border-border hover:shadow-md"
             >
               <h2 className="text-xl font-semibold text-foreground">{item.title}</h2>
               <p className="mt-2 min-h-12 text-sm leading-6 text-muted">

@@ -109,13 +109,6 @@ const chartColors = {
   track: "#F8F8F8",
 };
 
-const chartFills = [
-  chartColors.fill,
-  chartColors.fillDark,
-  "#B2B4B7",
-  chartColors.fillLight,
-];
-
 function EmptyChart() {
   return (
     <div className="flex h-full min-h-44 w-full items-center justify-center rounded-xl bg-cool text-sm text-muted">
@@ -124,39 +117,45 @@ function EmptyChart() {
   );
 }
 
-function CapsuleBar({
+function ChartRow({
+  label,
   value,
   max,
-  color,
-  title,
+  valueLabel,
+  detail,
+  accent = "blue",
 }: {
+  label: string;
   value: number;
   max: number;
-  color: string;
-  title: string;
+  valueLabel: string;
+  detail?: string;
+  accent?: "blue" | "taupe";
 }) {
-  const height = Math.max((value / max) * 100, value > 0 ? 14 : 0);
+  const width = value > 0 ? Math.max((value / max) * 100, 5) : 0;
+  const color = accent === "taupe" ? chartColors.fillDark : chartColors.fill;
 
   return (
-    <div
-      className="relative flex h-40 w-full max-w-10 items-end overflow-hidden rounded-full shadow-inner"
-      style={{ backgroundColor: chartColors.track }}
-      title={title}
-    >
-      <div
-        className="absolute bottom-0 left-0 right-0 rounded-full"
-        style={{
-          height: `${height}%`,
-          backgroundColor: color,
-        }}
-      />
-      <div
-        className="absolute bottom-0 right-0 w-2 rounded-full opacity-60"
-        style={{
-          height: `${height}%`,
-          backgroundColor: chartColors.axis,
-        }}
-      />
+    <div className="grid gap-2">
+      <div className="flex items-start justify-between gap-3 text-sm">
+        <div>
+          <p className="font-medium text-foreground">{label}</p>
+          {detail && <p className="mt-0.5 text-xs text-muted">{detail}</p>}
+        </div>
+        <span className="shrink-0 font-semibold text-foreground">
+          {valueLabel}
+        </span>
+      </div>
+      <div className="h-4 overflow-hidden rounded-full border border-border bg-background">
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: `${Math.min(width, 100)}%`,
+            backgroundColor: color,
+            boxShadow: `inset -8px 0 0 ${chartColors.axis}33`,
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -169,19 +168,17 @@ function BarChart({ data }: { data: ChartPoint[] }) {
       {data.length === 0 ? (
         <EmptyChart />
       ) : (
-        <div className="flex h-52 items-end gap-3 border-b-2 pb-2" style={{ borderColor: chartColors.axis }}>
+        <div className="grid gap-4">
           {data.map((item, index) => (
-            <div key={item.date} className="flex flex-1 flex-col items-center gap-2">
-              <CapsuleBar
-                value={item.minutes}
-                max={max}
-                color={chartFills[index % chartFills.length]}
-                title={`${item.minutes} мин`}
-              />
-              <span className="text-xs font-medium text-muted">
-                {formatDate(item.date)}
-              </span>
-            </div>
+            <ChartRow
+              key={item.date}
+              label={formatDate(item.date)}
+              value={item.minutes}
+              max={max}
+              valueLabel={`${item.minutes} мин`}
+              detail="фокус-время за день"
+              accent={index % 2 === 0 ? "blue" : "taupe"}
+            />
           ))}
         </div>
       )}
@@ -197,19 +194,17 @@ function CycleChart({ data }: { data: CyclePoint[] }) {
       {chartData.length === 0 ? (
         <EmptyChart />
       ) : (
-        <div className="flex h-52 items-end gap-3 border-b-2 pb-2" style={{ borderColor: chartColors.axis }}>
+        <div className="grid gap-4">
           {chartData.map((item, index) => (
-            <div key={item.id} className="flex flex-1 flex-col items-center gap-2">
-              <CapsuleBar
-                value={Math.min(Math.max(item.completionRate, 0), 100)}
-                max={100}
-                color={chartFills[index % chartFills.length]}
-                title={`${item.completedCycles}/${item.plannedCycles} циклов`}
-              />
-              <span className="text-xs font-medium text-muted">
-                {item.completedCycles}/{item.plannedCycles}
-              </span>
-            </div>
+            <ChartRow
+              key={item.id}
+              label={formatDate(item.date)}
+              value={Math.min(Math.max(item.completionRate, 0), 100)}
+              max={100}
+              valueLabel={`${item.completedCycles}/${item.plannedCycles} циклов`}
+              detail={`${Math.round(item.completionRate)}% завершено`}
+              accent={index % 2 === 0 ? "taupe" : "blue"}
+            />
           ))}
         </div>
       )}
@@ -226,28 +221,22 @@ function HourChart({ data }: { data: HourPoint[] }) {
       {activeHours.length === 0 ? (
         <EmptyChart />
       ) : (
-        <div className="grid h-52 grid-cols-[2rem_1fr] gap-3">
-          <div className="flex flex-col justify-between pb-8 text-xs text-border">
-            <span>{max}</span>
-            <span>{Math.round(max / 2)}</span>
-            <span>0</span>
-          </div>
+        <div className="grid gap-4">
+          {activeHours.map((item, index) => {
+            const endHour = String((item.hour + 1) % 24).padStart(2, "0");
 
-          <div className="flex items-end gap-3 border-b-2 pb-2" style={{ borderColor: chartColors.axis }}>
-            {activeHours.map((item, index) => (
-              <div key={item.hour} className="flex flex-1 flex-col items-center gap-2">
-                <CapsuleBar
-                  value={item.score}
-                  max={max}
-                  color={chartFills[index % chartFills.length]}
-                  title={`${item.score} баллов`}
-                />
-                <span className="text-xs font-medium text-muted">
-                  {item.label.slice(0, 2)}
-                </span>
-              </div>
-            ))}
-          </div>
+            return (
+              <ChartRow
+                key={item.hour}
+                label={`${item.label}-${endHour}:00`}
+                value={item.score}
+                max={max}
+                valueLabel={`${item.score}%`}
+                detail={`${item.sessions} сесс., ${item.minutes} мин`}
+                accent={index % 2 === 0 ? "blue" : "taupe"}
+              />
+            );
+          })}
         </div>
       )}
     </div>
@@ -359,12 +348,12 @@ export default function AnalyticsPage() {
       <TopNav />
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <section className="mb-8 rounded-2xl border border-border bg-foreground p-7 text-background shadow-sm">
-          <p className="text-sm font-medium text-accent">Аналитика и фокус-профиль</p>
+        <section className="mb-8 rounded-2xl border border-border bg-surface p-7 shadow-sm">
+          <p className="text-sm font-medium text-accent-strong">Аналитика и фокус-профиль</p>
           <div className="mt-3 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
               <h1 className="text-4xl font-bold sm:text-5xl">Аналитика</h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-accent">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
                 Основные показатели продуктивности, графики фокус-времени и
                 персональные AI-рекомендации по нажатию кнопки.
               </p>
@@ -380,10 +369,10 @@ export default function AnalyticsPage() {
                 ].map(([label, value]) => (
                   <div
                     key={label}
-                    className="rounded-xl border border-background/15 bg-background/10 p-4"
+                    className="rounded-xl border border-border bg-cool p-4"
                   >
-                    <p className="text-xs text-accent">{label}</p>
-                    <p className="mt-2 text-xl font-bold text-background">{value}</p>
+                    <p className="text-xs text-muted">{label}</p>
+                    <p className="mt-2 text-xl font-bold text-foreground">{value}</p>
                   </div>
                 ))}
               </div>

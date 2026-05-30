@@ -237,7 +237,7 @@ export default function TasksPage() {
               tasks.map((task) => (
                 <article
                   key={task.id}
-                  className="rounded-lg border border-border bg-surface p-5 shadow-sm"
+                  className="rounded-lg border border-border bg-cool p-5 shadow-sm"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
@@ -287,7 +287,7 @@ export default function TasksPage() {
                     <button
                       type="button"
                       onClick={() => deleteTask(task.id)}
-                      className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-background hover:bg-red-700"
+                      className="rounded-lg bg-accent-strong px-3 py-2 text-sm font-medium text-background hover:bg-muted"
                     >
                       Удалить
                     </button>
