@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum SessionMode {
+  POMODORO_25_5
+  DEEP_WORK_50_10
+  CUSTOM
+}
+
+enum MetricPeriodType {
+  DAY
+  WEEK
+  MONTH
+}
+
+enum AIRequestStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum RecommendationType {
+  FOCUS_DURATION
+  BREAK_DURATION
+  PRODUCTIVITY_TIME
+  DISTRACTION_REDUCTION
+  GENERAL
+}
+
+enum RecommendationPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id           Int    @id @default(autoincrement())
+  name         String @db.VarChar(100)
+  email        String @unique @db.VarChar(255)
+  passwordHash String @map("password_hash") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tasks               Task[]
+  focusSessions       FocusSession[]
+  productivityMetrics ProductivityMetric[]
+  focusProfile        FocusProfile?
+  aiRequests          AIRequest[]
+  recommendations     Recommendation[]
+
+  @@map("users")
+}
+
+model Task {
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(150)
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+
+  userId Int @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  focusSessions FocusSession[]
+
+  @@map("tasks")
+}
+
+model FocusSession {
+  id Int @id @default(autoincrement())
+
+  mode SessionMode
+
+  focusDuration Int @map("focus_duration")
+  breakDuration Int @map("break_duration")
+
+  plannedCycles   Int @map("planned_cycles")
+  completedCycles Int @default(0) @map("completed_cycles")
+
+  startTime DateTime  @map("start_time")
+  endTime   DateTime? @map("end_time")
+  duration  Int?
+
+  interruptions     Int  @default(0)
+  productivityScore Int? @map("productivity_score")
+
+  taskId Int? @map("task_id")
+  userId Int  @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@map("focus_sessions")
+}
+
+model ProductivityMetric {
+  id Int @id @default(autoincrement())
+
+  periodType  MetricPeriodType @map("period_type")
+  periodStart DateTime         @map("period_start")
+  periodEnd   DateTime         @map("period_end")
+
+  totalFocusMinutes Int @default(0) @map("total_focus_minutes")
+  completedSessions Int @default(0) @map("completed_sessions")
+
+  averageFocusDuration Decimal? @map("average_focus_duration") @db.Decimal(6, 2)
+  averageInterruptions Decimal? @map("average_interruptions") @db.Decimal(6, 2)
+  completionRate       Decimal? @map("completion_rate") @db.Decimal(5, 2)
+  consistencyScore     Decimal? @map("consistency_score") @db.Decimal(5, 2)
+  productivityScore    Decimal? @map("productivity_score") @db.Decimal(5, 2)
+
+  bestFocusHour Int? @map("best_focus_hour")
+
+  userId Int @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  focusProfiles FocusProfile[]
+  aiRequests    AIRequest[]
+
+  @@map("productivity_metrics")
+}
+
+model FocusProfile {
+  id Int @id @default(autoincrement())
+
+  bestFocusDuration    Int?    @map("best_focus_duration")
+  optimalBreakDuration Int?    @map("optimal_break_duration")
+  peakHours            String? @map("peak_hours") @db.VarChar(255)
+  focusStability       Int?    @map("focus_stability")
+  summary              String?
+
+  profileVersion Int @default(1) @map("profile_version")
+
+  userId           Int  @unique @map("user_id")
+  basedOnMetricsId Int? @map("based_on_metrics_id")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  basedOnMetrics ProductivityMetric? @relation(fields: [basedOnMetricsId], references: [id], onDelete: SetNull)
+
+  aiRequests AIRequest[]
+
+  @@map("focus_profiles")
+}
+
+model AIRequest {
+  id Int @id @default(autoincrement())
+
+  promptSnapshot   String? @map("prompt_snapshot")
+  inputContextJson String? @map("input_context_json")
+  modelName        String? @map("model_name") @db.VarChar(100)
+
+  requestStatus AIRequestStatus @default(PENDING) @map("request_status")
+
+  userId         Int  @map("user_id")
+  focusProfileId Int? @map("focus_profile_id")
+  metricsId      Int? @map("metrics_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  focusProfile FocusProfile?       @relation(fields: [focusProfileId], references: [id], onDelete: SetNull)
+  metrics      ProductivityMetric? @relation(fields: [metricsId], references: [id], onDelete: SetNull)
+
+  recommendations Recommendation[]
+
+  @@map("ai_requests")
+}
+
+model Recommendation {
+  id Int @id @default(autoincrement())
+
+  title       String @db.VarChar(150)
+  description String
+
+  type     RecommendationType     @default(GENERAL)
+  priority RecommendationPriority @default(MEDIUM)
+
+  isActive Boolean @default(true) @map("is_active")
+
+  userId      Int  @map("user_id")
+  aiRequestId Int? @map("ai_request_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aiRequest AIRequest? @relation(fields: [aiRequestId], references: [id], onDelete: SetNull)
+
+  @@map("recommendations")
+}
