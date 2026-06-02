@@ -81,6 +81,7 @@ export default function FocusPage() {
   const phaseRef = useRef<Phase>("focus");
   const phaseEndsAtRef = useRef<number | null>(null);
   const focusPhaseStartedAtRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const savedRef = useRef(false);
   const startTimeRef = useRef<string | null>(null);
   const focusSecondsWorkedRef = useRef(0);
@@ -120,6 +121,57 @@ export default function FocusPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+  }
+
+  function getAudioContext() {
+    const AudioContextConstructor =
+      window.AudioContext ||
+      (
+        window as typeof window & {
+          webkitAudioContext?: typeof AudioContext;
+        }
+      ).webkitAudioContext;
+
+    if (!AudioContextConstructor) return null;
+
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContextConstructor();
+    }
+
+    return audioContextRef.current;
+  }
+
+  function playSignal(kind: "start" | "transition" | "finish") {
+    const audioContext = getAudioContext();
+
+    if (!audioContext) return;
+
+    void audioContext.resume();
+
+    const pattern =
+      kind === "start"
+        ? [660]
+        : kind === "finish"
+          ? [880, 660, 880]
+          : [740, 520];
+
+    pattern.forEach((frequency, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const startAt = audioContext.currentTime + index * 0.16;
+      const duration = 0.12;
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(frequency, startAt);
+      gain.gain.setValueAtTime(0, startAt);
+      gain.gain.linearRampToValueAtTime(0.16, startAt + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
+
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(startAt);
+      oscillator.stop(startAt + duration);
+    });
   }
 
   function getCurrentFocusSeconds(now = getTimestamp()) {
@@ -231,6 +283,7 @@ export default function FocusPage() {
           setIsStarted(false);
           setPhase("focus");
           phaseRef.current = "focus";
+          playSignal("finish");
           void saveSession(nextCompleted);
           return;
         }
@@ -239,6 +292,7 @@ export default function FocusPage() {
         phaseEndsAtRef.current = now + breakSeconds * 1000;
         setPhase("break");
         setTimeLeft(breakSeconds);
+        playSignal("transition");
         return;
       }
 
@@ -247,6 +301,7 @@ export default function FocusPage() {
       phaseEndsAtRef.current = now + focusSeconds * 1000;
       setPhase("focus");
       setTimeLeft(focusSeconds);
+      playSignal("transition");
     };
 
     tick();
@@ -279,6 +334,7 @@ export default function FocusPage() {
     setTimeLeft(focusSeconds);
     setMessage("Фокус-сессия запущена");
 
+    playSignal("start");
     runTimer();
   }
 
@@ -301,6 +357,7 @@ export default function FocusPage() {
     }
 
     stopTimer();
+    playSignal("finish");
 
     focusSecondsWorkedRef.current = getCurrentFocusSeconds();
     focusPhaseStartedAtRef.current = null;
@@ -374,6 +431,7 @@ export default function FocusPage() {
     return () => {
       window.clearTimeout(timeout);
       stopTimer();
+      void audioContextRef.current?.close();
     };
   }, [loadInitialData]);
 
