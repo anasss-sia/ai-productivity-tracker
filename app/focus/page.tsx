@@ -55,6 +55,10 @@ function formatTime(seconds: number) {
   return `${String(minutes).padStart(2, "0")}:${String(restSeconds).padStart(2, "0")}`;
 }
 
+function getTimestamp() {
+  return new Date().getTime();
+}
+
 export default function FocusPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -75,6 +79,8 @@ export default function FocusPage() {
   const completedCyclesRef = useRef(0);
   const interruptionsRef = useRef(0);
   const phaseRef = useRef<Phase>("focus");
+  const phaseEndsAtRef = useRef<number | null>(null);
+  const focusPhaseStartedAtRef = useRef<number | null>(null);
   const savedRef = useRef(false);
   const startTimeRef = useRef<string | null>(null);
   const focusSecondsWorkedRef = useRef(0);
@@ -114,6 +120,22 @@ export default function FocusPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+  }
+
+  function getCurrentFocusSeconds(now = getTimestamp()) {
+    if (
+      phaseRef.current !== "focus" ||
+      focusPhaseStartedAtRef.current === null
+    ) {
+      return focusSecondsWorkedRef.current;
+    }
+
+    const currentSegmentSeconds = Math.max(
+      0,
+      Math.floor((now - focusPhaseStartedAtRef.current) / 1000)
+    );
+
+    return focusSecondsWorkedRef.current + currentSegmentSeconds;
   }
 
   function validateSettings() {
@@ -179,45 +201,56 @@ export default function FocusPage() {
   function runTimer() {
     stopTimer();
 
-    intervalRef.current = setInterval(() => {
-      setTimeLeft((currentTime) => {
-        if (phaseRef.current === "focus") {
-          focusSecondsWorkedRef.current += 1;
+    const tick = () => {
+      const endsAt = phaseEndsAtRef.current;
+
+      if (!endsAt) return;
+
+      const now = getTimestamp();
+      const remainingSeconds = Math.max(0, Math.ceil((endsAt - now) / 1000));
+
+      setTimeLeft(remainingSeconds);
+
+      if (now < endsAt) return;
+
+      const cycles = Number(plannedCycles);
+      const focusSeconds = Number(focusDuration) * 60;
+      const breakSeconds = Number(breakDuration) * 60;
+
+      if (phaseRef.current === "focus") {
+        const nextCompleted = Math.min(completedCyclesRef.current + 1, cycles);
+
+        focusSecondsWorkedRef.current += focusSeconds;
+        focusPhaseStartedAtRef.current = null;
+        completedCyclesRef.current = nextCompleted;
+        setCompletedCycles(nextCompleted);
+
+        if (nextCompleted >= cycles) {
+          phaseEndsAtRef.current = null;
+          stopTimer();
+          setIsStarted(false);
+          setPhase("focus");
+          phaseRef.current = "focus";
+          void saveSession(nextCompleted);
+          return;
         }
 
-        if (currentTime > 1) {
-          return currentTime - 1;
-        }
+        phaseRef.current = "break";
+        phaseEndsAtRef.current = now + breakSeconds * 1000;
+        setPhase("break");
+        setTimeLeft(breakSeconds);
+        return;
+      }
 
-        const cycles = Number(plannedCycles);
-        const focusSeconds = Number(focusDuration) * 60;
-        const breakSeconds = Number(breakDuration) * 60;
+      phaseRef.current = "focus";
+      focusPhaseStartedAtRef.current = now;
+      phaseEndsAtRef.current = now + focusSeconds * 1000;
+      setPhase("focus");
+      setTimeLeft(focusSeconds);
+    };
 
-        if (phaseRef.current === "focus") {
-          const nextCompleted = Math.min(completedCyclesRef.current + 1, cycles);
-
-          completedCyclesRef.current = nextCompleted;
-          setCompletedCycles(nextCompleted);
-
-          if (nextCompleted >= cycles) {
-            stopTimer();
-            setIsStarted(false);
-            setPhase("focus");
-            phaseRef.current = "focus";
-            void saveSession(nextCompleted);
-            return 0;
-          }
-
-          phaseRef.current = "break";
-          setPhase("break");
-          return breakSeconds;
-        }
-
-        phaseRef.current = "focus";
-        setPhase("focus");
-        return focusSeconds;
-      });
-    }, 1000);
+    tick();
+    intervalRef.current = setInterval(tick, 250);
   }
 
   async function startSession() {
@@ -227,20 +260,23 @@ export default function FocusPage() {
 
     stopTimer();
 
-    const now = new Date().toISOString();
+    const now = getTimestamp();
+    const focusSeconds = Number(focusDuration) * 60;
 
     completedCyclesRef.current = 0;
     interruptionsRef.current = 0;
     phaseRef.current = "focus";
+    phaseEndsAtRef.current = now + focusSeconds * 1000;
+    focusPhaseStartedAtRef.current = now;
     savedRef.current = false;
-    startTimeRef.current = now;
+    startTimeRef.current = new Date(now).toISOString();
     focusSecondsWorkedRef.current = 0;
 
     setCompletedCycles(0);
     setInterruptions(0);
     setPhase("focus");
     setIsStarted(true);
-    setTimeLeft(Number(focusDuration) * 60);
+    setTimeLeft(focusSeconds);
     setMessage("Фокус-сессия запущена");
 
     runTimer();
@@ -266,6 +302,9 @@ export default function FocusPage() {
 
     stopTimer();
 
+    focusSecondsWorkedRef.current = getCurrentFocusSeconds();
+    focusPhaseStartedAtRef.current = null;
+    phaseEndsAtRef.current = null;
     setIsStarted(false);
     setPhase("focus");
     phaseRef.current = "focus";
