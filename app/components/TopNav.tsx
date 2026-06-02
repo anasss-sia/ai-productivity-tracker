@@ -1,6 +1,7 @@
 "use client";
 
 import { clearSession } from "@/app/lib/browser-storage";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -23,7 +24,18 @@ export function TopNav() {
   return (
     <header className="border-b border-border bg-surface/95">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-        <Link href="/dashboard" className="text-lg font-bold text-foreground">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-3 text-lg font-bold text-foreground"
+        >
+          <Image
+            src="/logo-option-1.png"
+            alt=""
+            width={32}
+            height={32}
+            className="rounded-md border border-border"
+            priority
+          />
           AI Productivity Tracker
         </Link>
 
