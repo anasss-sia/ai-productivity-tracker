@@ -158,13 +158,13 @@ export default function FocusPage() {
     pattern.forEach((frequency, index) => {
       const oscillator = audioContext.createOscillator();
       const gain = audioContext.createGain();
-      const startAt = audioContext.currentTime + index * 0.16;
-      const duration = 0.12;
+      const startAt = audioContext.currentTime + index * 0.24;
+      const duration = 0.22;
 
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(frequency, startAt);
       gain.gain.setValueAtTime(0, startAt);
-      gain.gain.linearRampToValueAtTime(0.16, startAt + 0.02);
+      gain.gain.linearRampToValueAtTime(0.32, startAt + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
 
       oscillator.connect(gain);
