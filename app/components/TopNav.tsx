@@ -51,7 +51,7 @@ export function TopNav() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-fit rounded-lg bg-accent-strong px-3 py-2 text-sm font-medium text-background transition hover:bg-foreground"
+            className="w-fit rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition hover:bg-accent active:bg-accent"
           >
             Выйти
           </button>

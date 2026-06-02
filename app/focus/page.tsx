@@ -471,7 +471,7 @@ export default function FocusPage() {
                 <button
                   type="button"
                   onClick={startSession}
-                  className="rounded-lg bg-accent p-3 font-medium text-background hover:bg-foreground"
+                  className="rounded-lg bg-foreground p-3 font-medium text-background transition hover:bg-accent active:bg-accent"
                 >
                   Запустить сессию
                 </button>
@@ -488,7 +488,7 @@ export default function FocusPage() {
                   <button
                     type="button"
                     onClick={finishEarly}
-                    className="rounded-lg bg-accent-strong p-3 font-medium text-background hover:bg-foreground"
+                    className="rounded-lg bg-foreground p-3 font-medium text-background transition hover:bg-accent active:bg-accent"
                   >
                     Завершить сессию
                   </button>

@@ -230,7 +230,7 @@ export default function TasksPage() {
 
               <button
                 type="submit"
-                className="rounded-lg bg-accent p-3 font-medium text-background hover:bg-foreground"
+                className="rounded-lg bg-foreground p-3 font-medium text-background transition hover:bg-accent active:bg-accent"
               >
                 Создать задачу
               </button>
@@ -275,14 +275,14 @@ export default function TasksPage() {
                     <button
                       type="button"
                       onClick={() => setEditingTask(task)}
-                      className="rounded-lg border border-border px-2 py-1 text-xs font-medium text-muted hover:bg-background"
+                      className="rounded-lg bg-foreground px-2 py-1 text-xs font-medium text-background transition hover:bg-accent active:bg-accent"
                     >
                       Редактировать
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteTask(task.id)}
-                      className="rounded-lg bg-accent-strong px-3 py-2 text-sm font-medium text-background hover:bg-foreground"
+                      className="rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background transition hover:bg-accent active:bg-accent"
                     >
                       Удалить
                     </button>
@@ -370,7 +370,7 @@ export default function TasksPage() {
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button
                   type="submit"
-                  className="rounded-lg bg-accent px-4 py-3 font-medium text-background hover:bg-foreground"
+                  className="rounded-lg bg-foreground px-4 py-3 font-medium text-background transition hover:bg-accent active:bg-accent"
                 >
                   Сохранить
                 </button>

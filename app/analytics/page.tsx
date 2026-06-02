@@ -327,7 +327,6 @@ export default function AnalyticsPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <section className="mb-8 rounded-2xl border border-border bg-surface p-7 shadow-sm">
-          <p className="text-sm font-medium text-accent-strong">Аналитика и фокус-профиль</p>
           <div className="mt-3">
             <h1 className="text-4xl font-bold sm:text-5xl">Аналитика</h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-muted">
@@ -442,7 +441,7 @@ export default function AnalyticsPage() {
                   type="button"
                   onClick={generateRecommendations}
                   disabled={isGenerating}
-                  className="rounded-lg bg-accent px-5 py-3 font-medium text-background disabled:bg-border"
+                  className="rounded-lg bg-foreground px-5 py-3 font-medium text-background transition hover:bg-accent active:bg-accent disabled:bg-border"
                 >
                   {isGenerating ? "Генерация..." : "Сгенерировать рекомендации"}
                 </button>

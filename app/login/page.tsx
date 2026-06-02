@@ -78,7 +78,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-accent p-3 font-medium text-background disabled:bg-border"
+          className="rounded-lg bg-foreground p-3 font-medium text-background transition hover:bg-accent active:bg-accent disabled:bg-border"
         >
           {isSubmitting ? "Вход..." : "Войти"}
         </button>
