@@ -4,7 +4,11 @@ import {
 } from "@/app/lib/analytics";
 import { getApiErrorMessage, getApiErrorStatus } from "@/app/lib/api-errors";
 import { getUserIdFromRequest } from "@/app/lib/auth";
-import { generateAiProfile } from "@/app/lib/openai";
+import {
+  generateAiProfile,
+  getConfiguredLlmModelName,
+  getLlmProvider,
+} from "@/app/lib/openai";
 import { prisma } from "@/app/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -17,12 +21,16 @@ function getAiErrorMessage(error: unknown) {
     return "Ошибка генерации AI-рекомендаций";
   }
 
-  if (error.message === "OPENAI_API_KEY is not configured") {
-    return "AI-модуль не настроен: добавьте OPENAI_API_KEY в файл .env и перезапустите сервер";
+  if (error.message === "EXTERNAL_LLM_API_KEY is not configured") {
+    return "AI-модуль не настроен: добавьте EXTERNAL_LLM_API_KEY или выберите LLM_PROVIDER=ollama";
   }
 
-  if (error.message === "AI_PROVIDER is disabled") {
+  if (error.message === "LLM_PROVIDER is disabled") {
     return "AI-модуль временно отключён в публичной версии. Основные функции приложения работают, а генерация рекомендаций доступна при подключении LLM-провайдера";
+  }
+
+  if (error.message === "LLM_PROVIDER is unsupported") {
+    return "AI-модуль настроен неверно: LLM_PROVIDER должен быть ollama, external или disabled";
   }
 
   if (
@@ -85,12 +93,7 @@ export async function POST(request: Request) {
         userId,
         metricsId: metric.id,
         requestStatus: "PENDING",
-        modelName:
-          (process.env.AI_PROVIDER || "ollama").toLowerCase() === "disabled"
-            ? "disabled"
-            : (process.env.AI_PROVIDER || "ollama").toLowerCase() === "openai"
-            ? process.env.OPENAI_MODEL || "gpt-4o-mini"
-            : process.env.OLLAMA_MODEL || "llama3.2",
+        modelName: `${getLlmProvider()}:${getConfiguredLlmModelName()}`,
         inputContextJson: JSON.stringify(promptPreviewContext),
       },
     });

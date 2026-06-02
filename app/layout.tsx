@@ -4,6 +4,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "AI Productivity Tracker",
   description: "Веб-приложение для задач, фокус-сессий, аналитики и AI-рекомендаций",
+  icons: {
+    icon: "/logo-option-1.png",
+    apple: "/logo-option-1.png",
+  },
 };
 
 export default function RootLayout({

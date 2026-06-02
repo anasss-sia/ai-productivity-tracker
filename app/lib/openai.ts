@@ -26,6 +26,8 @@ export type AiProfileResult = {
   }[];
 };
 
+export type LlmProvider = "ollama" | "external" | "disabled";
+
 const responseSchema = {
   type: "object",
   additionalProperties: false,
@@ -176,10 +178,30 @@ function normalizeAiResult(result: AiProfileResult): AiProfileResult {
 function extractResponseText(data: unknown) {
   if (typeof data !== "object" || data === null) return null;
 
-  const record = data as { output_text?: unknown; output?: unknown };
+  const record = data as {
+    choices?: unknown;
+    output_text?: unknown;
+    output?: unknown;
+  };
 
   if (typeof record.output_text === "string") {
     return record.output_text;
+  }
+
+  if (Array.isArray(record.choices)) {
+    for (const choice of record.choices) {
+      if (typeof choice !== "object" || choice === null) continue;
+
+      const message = (choice as { message?: unknown }).message;
+
+      if (typeof message !== "object" || message === null) continue;
+
+      const content = (message as { content?: unknown }).content;
+
+      if (typeof content === "string") {
+        return content;
+      }
+    }
   }
 
   if (!Array.isArray(record.output)) {
@@ -207,38 +229,108 @@ function extractResponseText(data: unknown) {
   return chunks.length > 0 ? chunks.join("\n") : null;
 }
 
-async function generateOpenAiProfile(context: AiContext) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+function normalizeProvider(value: string): LlmProvider {
+  const provider = value.toLowerCase();
+
+  if (provider === "openai") {
+    return "external";
+  }
+
+  if (
+    provider === "ollama" ||
+    provider === "external" ||
+    provider === "disabled"
+  ) {
+    return provider;
+  }
+
+  throw new Error("LLM_PROVIDER is unsupported");
+}
+
+export function getLlmProvider(): LlmProvider {
+  return normalizeProvider(process.env.LLM_PROVIDER || process.env.AI_PROVIDER || "ollama");
+}
+
+export function getConfiguredLlmModelName() {
+  const provider = getLlmProvider();
+
+  if (provider === "disabled") {
+    return "disabled";
+  }
+
+  if (provider === "external") {
+    return (
+      process.env.EXTERNAL_LLM_MODEL ||
+      process.env.OPENAI_MODEL ||
+      "gpt-4o-mini"
+    );
+  }
+
+  return process.env.OLLAMA_MODEL || "llama3.2";
+}
+
+function getExternalLlmUrl() {
+  return (
+    process.env.EXTERNAL_LLM_API_URL ||
+    "https://api.openai.com/v1/responses"
+  );
+}
+
+async function generateExternalProfile(context: AiContext) {
+  const apiKey = process.env.EXTERNAL_LLM_API_KEY || process.env.OPENAI_API_KEY;
+  const model = getConfiguredLlmModelName();
+  const apiUrl = getExternalLlmUrl();
   const promptSnapshot = buildPromptSnapshot(context);
 
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
+    throw new Error("EXTERNAL_LLM_API_KEY is not configured");
   }
 
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const isChatCompletionsEndpoint = apiUrl.includes("/chat/completions");
+  const requestBody = isChatCompletionsEndpoint
+    ? {
+        model,
+        messages: [
+          {
+            role: "user",
+            content: promptSnapshot,
+          },
+        ],
+        temperature: 0.2,
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "focus_profile_result",
+            strict: true,
+            schema: responseSchema,
+          },
+        },
+      }
+    : {
+        model,
+        input: [
+          {
+            role: "user",
+            content: promptSnapshot,
+          },
+        ],
+        text: {
+          format: {
+            type: "json_schema",
+            name: "focus_profile_result",
+            strict: true,
+            schema: responseSchema,
+          },
+        },
+      };
+
+  const response = await fetch(apiUrl, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model,
-      input: [
-        {
-          role: "user",
-          content: promptSnapshot,
-        },
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "focus_profile_result",
-          strict: true,
-          schema: responseSchema,
-        },
-      },
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   const data = await response.json();
@@ -247,7 +339,7 @@ async function generateOpenAiProfile(context: AiContext) {
     const message =
       typeof data?.error?.message === "string"
         ? data.error.message
-        : "OpenAI API request failed";
+        : "External LLM request failed";
 
     throw new Error(message);
   }
@@ -255,11 +347,11 @@ async function generateOpenAiProfile(context: AiContext) {
   const text = extractResponseText(data);
 
   if (!text) {
-    throw new Error("OpenAI response did not include text output");
+    throw new Error("External LLM response did not include text output");
   }
 
   return {
-    provider: "openai",
+    provider: "external",
     model,
     promptSnapshot,
     result: normalizeAiResult(JSON.parse(text) as AiProfileResult),
@@ -317,14 +409,14 @@ async function generateOllamaProfile(context: AiContext) {
 }
 
 export async function generateAiProfile(context: AiContext) {
-  const provider = (process.env.AI_PROVIDER || "ollama").toLowerCase();
+  const provider = getLlmProvider();
 
   if (provider === "disabled") {
-    throw new Error("AI_PROVIDER is disabled");
+    throw new Error("LLM_PROVIDER is disabled");
   }
 
-  if (provider === "openai") {
-    return generateOpenAiProfile(context);
+  if (provider === "external") {
+    return generateExternalProfile(context);
   }
 
   return generateOllamaProfile(context);
