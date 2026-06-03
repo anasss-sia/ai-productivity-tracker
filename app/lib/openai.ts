@@ -96,7 +96,7 @@ export function buildPromptSnapshot(context: AiContext) {
   return [
     "Ты AI-модуль учебного веб-приложения AI Productivity Tracker.",
     "Проанализируй метрики фокус-сессий пользователя и верни JSON по заданной схеме.",
-    "Все значения строк должны быть только на русском языке. Не используй английские слова вроде focus, breaks, distractions, productivity, stay.",
+    "Все значения строк должны быть только на русском языке. Не используй английские слова, транслитерацию и смешанные фразы вроде focus, breaks, distractions, productivity, stay, journal, sessions, optimize.",
     "Не принимай решения вместо пользователя: формулируй рекомендации как мягкие советы.",
     "Текст должен быть на русском языке, понятный студенту или специалисту.",
     "profile.peakHours всегда должен быть строкой в формате HH:00-HH:00, например 18:00-19:00. Не возвращай массив.",
@@ -145,12 +145,27 @@ function formatHourRangeFromValue(value: unknown) {
 
 function normalizeRussianText(value: string) {
   return value
+    .replace(
+      /Summarize\s+your\s+фокус\s+sessions?\s+to\s+optimi[sz]e\s+продуктивность\.?/gi,
+      "Подведите итог фокус-сессий, чтобы повысить продуктивность."
+    )
+    .replace(/Напишите\s+в\s+journal/gi, "Ведите дневник")
+    .replace(/\bjournal\b/gi, "дневнике")
+    .replace(/\bsessions?\b/gi, "сессии")
+    .replace(/\boptimi[sz]e\b/gi, "повысить")
     .replace(/\bbreaks?\b/gi, "перерывы")
     .replace(/\bfocus\b/gi, "фокус")
-    .replace(/\bdistractions?\b/gi, "прерывания")
+    .replace(/\bdistractions?\b/gi, "отвлечения")
     .replace(/\bproductivity\b/gi, "продуктивность")
     .replace(/\bstay\b/gi, "оставаться")
-    .replace(/\brejuvenation\b/gi, "восстановления");
+    .replace(/\btracking\b/gi, "отслеживания")
+    .replace(/\bapp(?:lication)?\b/gi, "приложение")
+    .replace(/\brejuvenation\b/gi, "восстановления")
+    .replace(/\byour\b/gi, "ваши")
+    .replace(/вам\s*оставаться/gi, "вам оставаться")
+    .replace(/фокус\s+сессии/gi, "фокус-сессии")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function addProductivityPercents(value: string) {

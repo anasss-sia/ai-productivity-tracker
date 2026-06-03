@@ -83,22 +83,29 @@ function formatDate(value: string) {
   });
 }
 
-function priorityLabel(priority: string) {
-  if (priority === "HIGH") return "Высокий";
-  if (priority === "LOW") return "Низкий";
-  return "Средний";
-}
-
-function priorityClassName(priority: string) {
-  if (priority === "HIGH") {
-    return "border-accent-strong bg-background text-accent-strong";
-  }
-
-  if (priority === "LOW") {
-    return "border-border bg-background text-muted";
-  }
-
-  return "border-border bg-background text-foreground";
+function normalizeAiDisplayText(value: string) {
+  return value
+    .replace(
+      /Summarize\s+your\s+фокус\s+sessions?\s+to\s+optimi[sz]e\s+продуктивность\.?/gi,
+      "Подведите итог фокус-сессий, чтобы повысить продуктивность."
+    )
+    .replace(/Напишите\s+в\s+journal/gi, "Ведите дневник")
+    .replace(/\bjournal\b/gi, "дневнике")
+    .replace(/\bsessions?\b/gi, "сессии")
+    .replace(/\boptimi[sz]e\b/gi, "повысить")
+    .replace(/\bfocus\b/gi, "фокус")
+    .replace(/\bbreaks?\b/gi, "перерывы")
+    .replace(/\bdistractions?\b/gi, "отвлечения")
+    .replace(/\bproductivity\b/gi, "продуктивность")
+    .replace(/\bstay\b/gi, "оставаться")
+    .replace(/\btracking\b/gi, "отслеживания")
+    .replace(/\bapp(?:lication)?\b/gi, "приложение")
+    .replace(/\brejuvenation\b/gi, "восстановления")
+    .replace(/\byour\b/gi, "ваши")
+    .replace(/вам\s*оставаться/gi, "вам оставаться")
+    .replace(/фокус\s+сессии/gi, "фокус-сессии")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 const chartColors = {
@@ -489,7 +496,7 @@ export default function AnalyticsPage() {
 
                   {activeProfile.summary && (
                     <p className="mt-5 leading-7 text-muted">
-                      {activeProfile.summary}
+                      {normalizeAiDisplayText(activeProfile.summary)}
                     </p>
                   )}
                 </div>
@@ -513,22 +520,12 @@ export default function AnalyticsPage() {
                         key={recommendation.id}
                         className="rounded-lg border border-border p-5"
                       >
-                        <div className="mb-3 flex items-start justify-between gap-3">
-                          <h4 className="font-semibold text-foreground">
-                            {recommendation.title}
-                          </h4>
-
-                          <span
-                            className={`shrink-0 rounded-lg border px-3 py-1 text-xs ${priorityClassName(
-                              recommendation.priority
-                            )}`}
-                          >
-                            {priorityLabel(recommendation.priority)}
-                          </span>
-                        </div>
+                        <h4 className="mb-3 font-semibold text-foreground">
+                          {normalizeAiDisplayText(recommendation.title)}
+                        </h4>
 
                         <p className="leading-6 text-muted">
-                          {recommendation.description}
+                          {normalizeAiDisplayText(recommendation.description)}
                         </p>
                       </article>
                     ))}
