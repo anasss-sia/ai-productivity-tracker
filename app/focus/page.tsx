@@ -1,7 +1,7 @@
 "use client";
 
 import { TopNav } from "@/app/components/TopNav";
-import { getStoredToken } from "@/app/lib/browser-storage";
+import { getStorage, getStoredToken } from "@/app/lib/browser-storage";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -26,12 +26,33 @@ type FocusHistoryItem = {
 
 type Phase = "focus" | "break";
 type Mode = "POMODORO_25_5" | "DEEP_WORK_50_10" | "CUSTOM";
+type SignalTone = "SOFT" | "NORMAL" | "LOUD";
 
 const modeLabels: Record<Mode, string> = {
   POMODORO_25_5: "25/5",
   DEEP_WORK_50_10: "50/10",
   CUSTOM: "Пользовательский",
 };
+
+const signalToneLabels: Record<SignalTone, string> = {
+  SOFT: "Мягкий",
+  NORMAL: "Обычный",
+  LOUD: "Громкий",
+};
+
+const signalToneGain: Record<SignalTone, number> = {
+  SOFT: 0.32,
+  NORMAL: 0.56,
+  LOUD: 0.78,
+};
+
+const signalToneWave: Record<SignalTone, OscillatorType> = {
+  SOFT: "sine",
+  NORMAL: "triangle",
+  LOUD: "square",
+};
+
+const signalSettingsStorageKey = "focusSignalSettings";
 
 function getToken() {
   return getStoredToken();
@@ -74,8 +95,13 @@ export default function FocusPage() {
   const [phase, setPhase] = useState<Phase>("focus");
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [message, setMessage] = useState("");
+  const [phaseNotice, setPhaseNotice] = useState("");
+  const [signalTone, setSignalTone] = useState<SignalTone>("NORMAL");
+  const [signalVolume, setSignalVolume] = useState(90);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const noticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const signalSettingsLoadedRef = useRef(false);
   const completedCyclesRef = useRef(0);
   const interruptionsRef = useRef(0);
   const phaseRef = useRef<Phase>("focus");
@@ -123,6 +149,31 @@ export default function FocusPage() {
     }
   }
 
+  function showPhaseNotice(text: string) {
+    if (noticeTimeoutRef.current) {
+      clearTimeout(noticeTimeoutRef.current);
+    }
+
+    setPhaseNotice(text);
+
+    noticeTimeoutRef.current = setTimeout(() => {
+      setPhaseNotice("");
+    }, 3500);
+  }
+
+  function vibrateSignal(kind: "start" | "transition" | "finish") {
+    if (!navigator.vibrate) return;
+
+    const pattern =
+      kind === "finish"
+        ? [180, 90, 180, 90, 240]
+        : kind === "transition"
+          ? [160, 80, 160]
+          : [140];
+
+    navigator.vibrate(pattern);
+  }
+
   function getAudioContext() {
     const AudioContextConstructor =
       window.AudioContext ||
@@ -144,6 +195,8 @@ export default function FocusPage() {
   function playSignal(kind: "start" | "transition" | "finish") {
     const audioContext = getAudioContext();
 
+    vibrateSignal(kind);
+
     if (!audioContext) return;
 
     void audioContext.resume();
@@ -160,11 +213,13 @@ export default function FocusPage() {
       const gain = audioContext.createGain();
       const startAt = audioContext.currentTime + index * 0.24;
       const duration = 0.22;
+      const safeVolume = Math.min(Math.max(signalVolume, 0), 100) / 100;
+      const targetGain = signalToneGain[signalTone] * safeVolume;
 
-      oscillator.type = "sine";
+      oscillator.type = signalToneWave[signalTone];
       oscillator.frequency.setValueAtTime(frequency, startAt);
       gain.gain.setValueAtTime(0, startAt);
-      gain.gain.linearRampToValueAtTime(0.46, startAt + 0.03);
+      gain.gain.linearRampToValueAtTime(targetGain, startAt + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
 
       oscillator.connect(gain);
@@ -283,6 +338,7 @@ export default function FocusPage() {
           setIsStarted(false);
           setPhase("focus");
           phaseRef.current = "focus";
+          showPhaseNotice("Сессия завершена");
           playSignal("finish");
           void saveSession(nextCompleted);
           return;
@@ -292,6 +348,7 @@ export default function FocusPage() {
         phaseEndsAtRef.current = now + breakSeconds * 1000;
         setPhase("break");
         setTimeLeft(breakSeconds);
+        showPhaseNotice("Перерыв начался");
         playSignal("transition");
         return;
       }
@@ -301,6 +358,7 @@ export default function FocusPage() {
       phaseEndsAtRef.current = now + focusSeconds * 1000;
       setPhase("focus");
       setTimeLeft(focusSeconds);
+      showPhaseNotice("Фокус начался");
       playSignal("transition");
     };
 
@@ -334,6 +392,7 @@ export default function FocusPage() {
     setTimeLeft(focusSeconds);
     setMessage("Фокус-сессия запущена");
 
+    showPhaseNotice("Фокус начался");
     playSignal("start");
     runTimer();
   }
@@ -357,6 +416,7 @@ export default function FocusPage() {
     }
 
     stopTimer();
+    showPhaseNotice("Сессия завершена");
     playSignal("finish");
 
     focusSecondsWorkedRef.current = getCurrentFocusSeconds();
@@ -430,10 +490,61 @@ export default function FocusPage() {
 
     return () => {
       window.clearTimeout(timeout);
+      if (noticeTimeoutRef.current) {
+        window.clearTimeout(noticeTimeoutRef.current);
+      }
       stopTimer();
       void audioContextRef.current?.close();
     };
   }, [loadInitialData]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const storage = getStorage();
+      const storedSettings = storage?.getItem(signalSettingsStorageKey);
+
+      if (!storedSettings) {
+        signalSettingsLoadedRef.current = true;
+        return;
+      }
+
+      try {
+        const parsedSettings = JSON.parse(storedSettings) as {
+          tone?: SignalTone;
+          volume?: number;
+        };
+
+        if (
+          parsedSettings.tone &&
+          Object.keys(signalToneLabels).includes(parsedSettings.tone)
+        ) {
+          setSignalTone(parsedSettings.tone);
+        }
+
+        if (typeof parsedSettings.volume === "number") {
+          setSignalVolume(Math.min(Math.max(parsedSettings.volume, 0), 100));
+        }
+      } catch {
+        storage?.removeItem(signalSettingsStorageKey);
+      }
+
+      signalSettingsLoadedRef.current = true;
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!signalSettingsLoadedRef.current) return;
+
+    getStorage()?.setItem(
+      signalSettingsStorageKey,
+      JSON.stringify({
+        tone: signalTone,
+        volume: signalVolume,
+      })
+    );
+  }, [signalTone, signalVolume]);
 
   const cycles = getValidNumber(plannedCycles, 1);
   const safeCompletedCycles = Math.min(completedCycles, cycles);
@@ -533,6 +644,49 @@ export default function FocusPage() {
                   />
                 </label>
               </div>
+
+              <div className="rounded-lg border border-border bg-background p-4">
+                <div className="grid gap-4 sm:grid-cols-[1fr_1.2fr]">
+                  <label className="grid gap-2 text-sm font-medium text-muted">
+                    Тип сигнала
+                    <select
+                      value={signalTone}
+                      onChange={(e) =>
+                        setSignalTone(e.target.value as SignalTone)
+                      }
+                      className="rounded-lg border border-border bg-surface p-3"
+                    >
+                      {Object.entries(signalToneLabels).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="grid gap-2 text-sm font-medium text-muted">
+                    <span className="flex items-center justify-between gap-3">
+                      Громкость сигнала
+                      <span className="font-semibold text-foreground">
+                        {signalVolume}%
+                      </span>
+                    </span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={signalVolume}
+                      onChange={(e) => setSignalVolume(Number(e.target.value))}
+                      className="h-2 accent-foreground"
+                    />
+                  </label>
+                </div>
+                <p className="mt-3 text-xs leading-5 text-muted">
+                  На телефоне сигнал может сопровождаться вибрацией, если браузер
+                  и устройство её поддерживают.
+                </p>
+              </div>
             </div>
           </section>
 
@@ -544,6 +698,15 @@ export default function FocusPage() {
             <div className="mt-5 text-6xl font-bold text-foreground sm:text-7xl">
               {formatTime(timeLeft)}
             </div>
+
+            {phaseNotice && (
+              <div
+                aria-live="polite"
+                className="mt-5 rounded-lg border border-foreground bg-foreground px-4 py-3 text-xl font-semibold text-background"
+              >
+                {phaseNotice}
+              </div>
+            )}
 
             <div className="mt-6 rounded-lg border border-border bg-surface p-4">
               <p className="text-sm text-muted">Завершено циклов</p>
