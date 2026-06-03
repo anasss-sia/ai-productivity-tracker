@@ -98,6 +98,7 @@ export default function FocusPage() {
   const [phaseNotice, setPhaseNotice] = useState("");
   const [signalTone, setSignalTone] = useState<SignalTone>("NORMAL");
   const [signalVolume, setSignalVolume] = useState(90);
+  const [isFocusFullscreen, setIsFocusFullscreen] = useState(false);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const noticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -423,6 +424,7 @@ export default function FocusPage() {
     focusPhaseStartedAtRef.current = null;
     phaseEndsAtRef.current = null;
     setIsStarted(false);
+    setIsFocusFullscreen(false);
     setPhase("focus");
     phaseRef.current = "focus";
 
@@ -549,6 +551,9 @@ export default function FocusPage() {
   const cycles = getValidNumber(plannedCycles, 1);
   const safeCompletedCycles = Math.min(completedCycles, cycles);
   const progress = Math.min((safeCompletedCycles / cycles) * 100, 100);
+  const selectedTaskTitle =
+    tasks.find((task) => String(task.id) === taskId)?.title ?? "Без задачи";
+  const phaseLabel = phase === "break" ? "Перерыв" : "Фокус";
 
   return (
     <main className="min-h-screen bg-background">
@@ -692,7 +697,7 @@ export default function FocusPage() {
 
           <section className="rounded-lg border border-border bg-surface p-6 text-center shadow-sm">
             <div className="inline-flex rounded-lg bg-background px-4 py-2 text-sm font-medium text-muted">
-              {phase === "break" ? "Перерыв" : "Фокус"}
+              {phaseLabel}
             </div>
 
             <div className="mt-5 text-6xl font-bold text-foreground sm:text-7xl">
@@ -752,6 +757,14 @@ export default function FocusPage() {
                   >
                     Завершить сессию
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsFocusFullscreen(true)}
+                    className="rounded-lg border border-border bg-surface p-3 font-medium text-foreground hover:bg-background"
+                  >
+                    Режим концентрации
+                  </button>
                 </>
               )}
             </div>
@@ -798,6 +811,75 @@ export default function FocusPage() {
           </div>
         </section>
       </div>
+
+      {isFocusFullscreen && (
+        <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-foreground px-4 py-6 text-background">
+          <section className="flex w-full max-w-4xl flex-col items-center text-center">
+            <div className="flex w-full items-center justify-between gap-4">
+              <button
+                type="button"
+                onClick={() => setIsFocusFullscreen(false)}
+                className="rounded-lg border border-background/40 px-4 py-2 text-sm font-medium text-background transition hover:bg-background hover:text-foreground"
+              >
+                Выйти из режима
+              </button>
+              <span className="rounded-lg border border-background/40 px-4 py-2 text-sm font-medium">
+                {selectedTaskTitle}
+              </span>
+            </div>
+
+            <div className="mt-16 rounded-lg border border-background/30 px-6 py-3 text-lg font-medium">
+              {phaseLabel}
+            </div>
+
+            <div className="mt-8 text-[clamp(5rem,18vw,13rem)] font-bold leading-none">
+              {formatTime(timeLeft)}
+            </div>
+
+            {phaseNotice && (
+              <div
+                aria-live="polite"
+                className="mt-8 rounded-lg bg-background px-6 py-4 text-2xl font-semibold text-foreground"
+              >
+                {phaseNotice}
+              </div>
+            )}
+
+            <div className="mt-10 w-full max-w-2xl">
+              <div className="flex items-center justify-between text-sm text-background/75">
+                <span>
+                  Циклы: {safeCompletedCycles} из {cycles}
+                </span>
+                <span>Прерывания: {interruptions}</span>
+              </div>
+              <div className="mt-4 h-4 overflow-hidden rounded-full bg-background/20">
+                <div
+                  className="h-4 rounded-full bg-background"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-10 grid w-full max-w-2xl gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={addInterruption}
+                className="rounded-lg border border-background/40 px-5 py-4 font-medium text-background transition hover:bg-background hover:text-foreground"
+              >
+                Отметить прерывание
+              </button>
+
+              <button
+                type="button"
+                onClick={finishEarly}
+                className="rounded-lg bg-background px-5 py-4 font-medium text-foreground transition hover:bg-accent hover:text-background"
+              >
+                Завершить сессию
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }
