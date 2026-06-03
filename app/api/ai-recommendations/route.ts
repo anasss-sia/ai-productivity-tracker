@@ -66,9 +66,7 @@ export async function POST(request: Request) {
     }
 
     const existingSessions = await getUserSessions(userId);
-    const completedSessions = existingSessions.filter(
-      (session) => session.completedCycles >= session.plannedCycles
-    );
+    const completedSessions = existingSessions;
 
     if (completedSessions.length < 3) {
       return NextResponse.json(

@@ -101,9 +101,7 @@ export function getModeCounts(sessions: SessionForAnalytics[]): ModeCount[] {
 
 export function calculateAnalytics(sessions: SessionForAnalytics[]) {
   const totalSessions = sessions.length;
-  const completedSessionsList = sessions.filter(
-    (session) => session.completedCycles >= session.plannedCycles
-  );
+  const completedSessionsList = sessions;
   const completedSessions = completedSessionsList.length;
   const totalFocusMinutes = sessions.reduce((sum, session) => sum + (session.duration ?? 0), 0);
   const totalInterruptions = sessions.reduce((sum, session) => sum + session.interruptions, 0);
