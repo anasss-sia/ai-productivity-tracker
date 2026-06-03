@@ -86,9 +86,14 @@ function formatDate(value: string) {
 function normalizeAiDisplayText(value: string) {
   return value
     .replace(
+      /(?:Summarize|[СC]уммарize)\s+(?:your|ваши)\s+фокус-сессии\s+to\s+повысить\s+продуктивность\.?/gi,
+      "Подведите итог фокус-сессий, чтобы повысить продуктивность."
+    )
+    .replace(
       /Summarize\s+your\s+фокус\s+sessions?\s+to\s+optimi[sz]e\s+продуктивность\.?/gi,
       "Подведите итог фокус-сессий, чтобы повысить продуктивность."
     )
+    .replace(/[СC]уммарize/gi, "Подведите итог")
     .replace(/Напишите\s+в\s+journal/gi, "Ведите дневник")
     .replace(/\bjournal\b/gi, "дневнике")
     .replace(/\bsessions?\b/gi, "сессии")
@@ -102,7 +107,9 @@ function normalizeAiDisplayText(value: string) {
     .replace(/\bapp(?:lication)?\b/gi, "приложение")
     .replace(/\brejuvenation\b/gi, "восстановления")
     .replace(/\byour\b/gi, "ваши")
+    .replace(/\bto\b/gi, "чтобы")
     .replace(/вам\s*оставаться/gi, "вам оставаться")
+    .replace(/Подведите итог ваши фокус-сессии чтобы повысить продуктивность\.?/gi, "Подведите итог фокус-сессий, чтобы повысить продуктивность.")
     .replace(/фокус\s+сессии/gi, "фокус-сессии")
     .replace(/\s+/g, " ")
     .trim();
