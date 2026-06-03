@@ -2,6 +2,10 @@ import {
   createProductivityMetricSnapshot,
   getUserSessions,
 } from "@/app/lib/analytics";
+import {
+  normalizeAiProfileSummary,
+  normalizeAiRecommendation,
+} from "@/app/lib/ai-text";
 import { getApiErrorMessage, getApiErrorStatus } from "@/app/lib/api-errors";
 import { getUserIdFromRequest } from "@/app/lib/auth";
 import {
@@ -180,10 +184,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       message: "AI-рекомендации успешно сгенерированы",
-      profile,
+      profile: normalizeAiProfileSummary(profile),
       metric,
       aiRequestId,
-      recommendations,
+      recommendations: recommendations.map(normalizeAiRecommendation),
     });
   } catch (error) {
     console.error("AI_RECOMMENDATIONS_ERROR:", error);

@@ -1,4 +1,5 @@
 import { getAnalyticsHour, type SessionForAnalytics } from "@/app/lib/analytics";
+import { normalizeAiText } from "@/app/lib/ai-text";
 
 type AiContext = {
   analytics: ReturnType<typeof import("@/app/lib/analytics").calculateAnalytics>;
@@ -143,38 +144,6 @@ function formatHourRangeFromValue(value: unknown) {
   return "нет данных";
 }
 
-function normalizeRussianText(value: string) {
-  return value
-    .replace(
-      /(?:Summarize|[СC]уммарize)\s+(?:your|ваши)\s+фокус-сессии\s+to\s+повысить\s+продуктивность\.?/gi,
-      "Подведите итог фокус-сессий, чтобы повысить продуктивность."
-    )
-    .replace(
-      /Summarize\s+your\s+фокус\s+sessions?\s+to\s+optimi[sz]e\s+продуктивность\.?/gi,
-      "Подведите итог фокус-сессий, чтобы повысить продуктивность."
-    )
-    .replace(/[СC]уммарize/gi, "Подведите итог")
-    .replace(/Напишите\s+в\s+journal/gi, "Ведите дневник")
-    .replace(/\bjournal\b/gi, "дневнике")
-    .replace(/\bsessions?\b/gi, "сессии")
-    .replace(/\boptimi[sz]e\b/gi, "повысить")
-    .replace(/\bbreaks?\b/gi, "перерывы")
-    .replace(/\bfocus\b/gi, "фокус")
-    .replace(/\bdistractions?\b/gi, "отвлечения")
-    .replace(/\bproductivity\b/gi, "продуктивность")
-    .replace(/\bstay\b/gi, "оставаться")
-    .replace(/\btracking\b/gi, "отслеживания")
-    .replace(/\bapp(?:lication)?\b/gi, "приложение")
-    .replace(/\brejuvenation\b/gi, "восстановления")
-    .replace(/\byour\b/gi, "ваши")
-    .replace(/\bto\b/gi, "чтобы")
-    .replace(/вам\s*оставаться/gi, "вам оставаться")
-    .replace(/Подведите итог ваши фокус-сессии чтобы повысить продуктивность\.?/gi, "Подведите итог фокус-сессий, чтобы повысить продуктивность.")
-    .replace(/фокус\s+сессии/gi, "фокус-сессии")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 function addProductivityPercents(value: string) {
   return value.replace(
     /(показател[ья] продуктивности(?: за сессию)?\s*[-–]\s*)(\d{1,3})(?!\s*[%\d])/gi,
@@ -187,12 +156,12 @@ function normalizeAiResult(result: AiProfileResult): AiProfileResult {
     profile: {
       ...result.profile,
       peakHours: formatHourRangeFromValue(result.profile.peakHours),
-      summary: addProductivityPercents(normalizeRussianText(result.profile.summary)),
+      summary: addProductivityPercents(normalizeAiText(result.profile.summary)),
     },
     recommendations: result.recommendations.map((recommendation) => ({
       ...recommendation,
-      title: normalizeRussianText(recommendation.title),
-      description: normalizeRussianText(recommendation.description),
+      title: normalizeAiText(recommendation.title),
+      description: normalizeAiText(recommendation.description),
     })),
   };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { TopNav } from "@/app/components/TopNav";
+import { normalizeAiText } from "@/app/lib/ai-text";
 import { getStoredToken } from "@/app/lib/browser-storage";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -81,38 +82,6 @@ function formatDate(value: string) {
     day: "2-digit",
     month: "2-digit",
   });
-}
-
-function normalizeAiDisplayText(value: string) {
-  return value
-    .replace(
-      /(?:Summarize|[СC]уммарize)\s+(?:your|ваши)\s+фокус-сессии\s+to\s+повысить\s+продуктивность\.?/gi,
-      "Подведите итог фокус-сессий, чтобы повысить продуктивность."
-    )
-    .replace(
-      /Summarize\s+your\s+фокус\s+sessions?\s+to\s+optimi[sz]e\s+продуктивность\.?/gi,
-      "Подведите итог фокус-сессий, чтобы повысить продуктивность."
-    )
-    .replace(/[СC]уммарize/gi, "Подведите итог")
-    .replace(/Напишите\s+в\s+journal/gi, "Ведите дневник")
-    .replace(/\bjournal\b/gi, "дневнике")
-    .replace(/\bsessions?\b/gi, "сессии")
-    .replace(/\boptimi[sz]e\b/gi, "повысить")
-    .replace(/\bfocus\b/gi, "фокус")
-    .replace(/\bbreaks?\b/gi, "перерывы")
-    .replace(/\bdistractions?\b/gi, "отвлечения")
-    .replace(/\bproductivity\b/gi, "продуктивность")
-    .replace(/\bstay\b/gi, "оставаться")
-    .replace(/\btracking\b/gi, "отслеживания")
-    .replace(/\bapp(?:lication)?\b/gi, "приложение")
-    .replace(/\brejuvenation\b/gi, "восстановления")
-    .replace(/\byour\b/gi, "ваши")
-    .replace(/\bto\b/gi, "чтобы")
-    .replace(/вам\s*оставаться/gi, "вам оставаться")
-    .replace(/Подведите итог ваши фокус-сессии чтобы повысить продуктивность\.?/gi, "Подведите итог фокус-сессий, чтобы повысить продуктивность.")
-    .replace(/фокус\s+сессии/gi, "фокус-сессии")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 const chartColors = {
@@ -503,7 +472,7 @@ export default function AnalyticsPage() {
 
                   {activeProfile.summary && (
                     <p className="mt-5 leading-7 text-muted">
-                      {normalizeAiDisplayText(activeProfile.summary)}
+                      {normalizeAiText(activeProfile.summary)}
                     </p>
                   )}
                 </div>
@@ -528,11 +497,11 @@ export default function AnalyticsPage() {
                         className="rounded-lg border border-border p-5"
                       >
                         <h4 className="mb-3 font-semibold text-foreground">
-                          {normalizeAiDisplayText(recommendation.title)}
+                          {normalizeAiText(recommendation.title)}
                         </h4>
 
                         <p className="leading-6 text-muted">
-                          {normalizeAiDisplayText(recommendation.description)}
+                          {normalizeAiText(recommendation.description)}
                         </p>
                       </article>
                     ))}
