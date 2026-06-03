@@ -76,6 +76,12 @@ function formatTime(seconds: number) {
   return `${String(minutes).padStart(2, "0")}:${String(restSeconds).padStart(2, "0")}`;
 }
 
+function formatDurationMinutes(duration: number | null) {
+  if (!duration) return "меньше 1 мин";
+
+  return `${duration} мин`;
+}
+
 function getTimestamp() {
   return new Date().getTime();
 }
@@ -447,7 +453,7 @@ export default function FocusPage() {
     const breakMinutes = Number(breakDuration);
     const cycles = Number(plannedCycles);
     const safeCompletedCycles = Math.min(finalCompletedCycles, cycles);
-    const duration = Math.ceil(focusSecondsWorkedRef.current / 60);
+    const duration = Math.floor(focusSecondsWorkedRef.current / 60);
 
     const response = await fetch("/api/focus-sessions", {
       method: "POST",
@@ -802,7 +808,7 @@ export default function FocusPage() {
                     Циклы: {session.completedCycles}/{session.plannedCycles}
                   </p>
                   <p className="text-sm text-muted">
-                    Фокус: {session.duration ?? 0} мин, прерывания:{" "}
+                    Фокус: {formatDurationMinutes(session.duration)}, прерывания:{" "}
                     {session.interruptions}
                   </p>
                 </article>

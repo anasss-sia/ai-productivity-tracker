@@ -203,30 +203,39 @@ export default function TasksPage() {
             <h2 className="text-xl font-semibold text-foreground">Новая задача</h2>
 
             <div className="mt-5 grid gap-4">
-              <input
-                type="text"
-                placeholder="Название задачи"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="rounded-lg border border-border p-3"
-              />
+              <label className="grid gap-2 text-sm font-medium text-muted">
+                Название задачи
+                <input
+                  type="text"
+                  placeholder="Название задачи"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="rounded-lg border border-border p-3"
+                />
+              </label>
 
-              <textarea
-                placeholder="Описание"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="min-h-28 rounded-lg border border-border p-3"
-              />
+              <label className="grid gap-2 text-sm font-medium text-muted">
+                Описание
+                <textarea
+                  placeholder="Описание"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="min-h-28 rounded-lg border border-border p-3"
+                />
+              </label>
 
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                className="rounded-lg border border-border p-3"
-              >
-                <option value="LOW">Низкий приоритет</option>
-                <option value="MEDIUM">Средний приоритет</option>
-                <option value="HIGH">Высокий приоритет</option>
-              </select>
+              <label className="grid gap-2 text-sm font-medium text-muted">
+                Приоритет
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value as TaskPriority)}
+                  className="rounded-lg border border-border p-3"
+                >
+                  <option value="LOW">Низкий приоритет</option>
+                  <option value="MEDIUM">Средний приоритет</option>
+                  <option value="HIGH">Высокий приоритет</option>
+                </select>
+              </label>
 
               <button
                 type="submit"
@@ -306,6 +315,7 @@ export default function TasksPage() {
               <div className="mt-5 grid gap-4">
                 <input
                   type="text"
+                  aria-label="Название задачи"
                   value={editingTask.title}
                   onChange={(e) =>
                     setEditingTask({ ...editingTask, title: e.target.value })
@@ -314,6 +324,7 @@ export default function TasksPage() {
                 />
 
                 <textarea
+                  aria-label="Описание задачи"
                   value={editingTask.description ?? ""}
                   onChange={(e) =>
                     setEditingTask({
