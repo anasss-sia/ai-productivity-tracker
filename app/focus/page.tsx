@@ -164,7 +164,7 @@ export default function FocusPage() {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(frequency, startAt);
       gain.gain.setValueAtTime(0, startAt);
-      gain.gain.linearRampToValueAtTime(0.32, startAt + 0.03);
+      gain.gain.linearRampToValueAtTime(0.46, startAt + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
 
       oscillator.connect(gain);
